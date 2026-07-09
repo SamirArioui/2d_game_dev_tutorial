@@ -1,0 +1,24 @@
+# Exercise 05 — solution
+cmake_minimum_required(VERSION 3.16)
+project(ex05 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_library(mathlib src/mathlib.cpp)
+target_include_directories(mathlib PUBLIC include)
+
+# A namespaced ALIAS. Linking math::math looks identical to linking a fetched
+# dependency (fmt::fmt) and can't be confused with a plain file on disk.
+add_library(math::math ALIAS mathlib)
+
+add_executable(app app/main.cpp)
+target_link_libraries(app PRIVATE math::math)
+
+# Install rules. `cmake --install build --prefix ./out` copies:
+#   - the executable  -> <prefix>/bin
+#   - the library     -> <prefix>/lib
+#   - the headers     -> <prefix>/include
+# You install the REAL target (mathlib), never the alias.
+install(TARGETS app mathlib)
+install(DIRECTORY include/ DESTINATION include)

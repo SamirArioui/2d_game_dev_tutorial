@@ -1,0 +1,32 @@
+// Exercise 03 — linear interpolation (solution).
+
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+struct Vec2 {
+    float x;
+    float y;
+};
+
+float lerp(float a, float b, float t) {
+    return a + (b - a) * t;
+}
+
+Vec2 lerp(const Vec2& a, const Vec2& b, float t) {
+    return Vec2{lerp(a.x, b.x, t), lerp(a.y, b.y, t)};
+}
+
+TEST_CASE("scalar lerp hits both endpoints and the midpoint") {
+    REQUIRE(lerp(0.0f, 10.0f, 0.0f) == Catch::Approx(0.0f));
+    REQUIRE(lerp(0.0f, 10.0f, 1.0f) == Catch::Approx(10.0f));
+    REQUIRE(lerp(0.0f, 10.0f, 0.5f) == Catch::Approx(5.0f));
+    REQUIRE(lerp(10.0f, 20.0f, 0.25f) == Catch::Approx(12.5f));
+}
+
+TEST_CASE("vector lerp is component-wise") {
+    Vec2 a{0.0f, 0.0f};
+    Vec2 b{100.0f, 200.0f};
+    Vec2 mid = lerp(a, b, 0.5f);
+    REQUIRE(mid.x == Catch::Approx(50.0f));
+    REQUIRE(mid.y == Catch::Approx(100.0f));
+}

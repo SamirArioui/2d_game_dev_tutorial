@@ -1,0 +1,27 @@
+# Coding style for the whole course. See STYLE.md for the human-readable rules.
+# Based on LLVM style with the course's tweaks (4-space indent, ~100 columns).
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+# Braces on the same line; always brace control-flow bodies.
+BreakBeforeBraces: Attach
+InsertBraces: true
+
+# Pointers/references bind to the type: `int* p`, `const Vec2& v`.
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Includes: keep grouped, sorted within a group.
+SortIncludes: CaseInsensitive
+IncludeBlocks: Regroup
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+SpaceBeforeParens: ControlStatements

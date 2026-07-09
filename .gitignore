@@ -1,0 +1,28 @@
+# Build output
+build/
+build*/
+out/
+cmake-build-*/
+
+# CMake FetchContent cache / generated files
+_deps/
+CMakeCache.txt
+CMakeFiles/
+compile_commands.json
+
+# Compiled binaries & objects
+*.o
+*.obj
+*.exe
+*.out
+*.app
+character_sheet
+a.out
+
+# Editor / OS cruft
+.vscode/
+.idea/
+.DS_Store
+
+# Local run artifacts (e.g. save files written by later stages)
+*.log

@@ -1,0 +1,17 @@
+# Exercise 02 — solution
+cmake_minimum_required(VERSION 3.16)
+project(ex02 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# A static library: compiled once into libgreeter.a, ready to be linked.
+add_library(greeter greeter.cpp)
+
+# The program.
+add_executable(app main.cpp)
+
+# Tell the linker `app` needs `greeter`. PRIVATE = this dependency is app's own
+# business (nothing links `app`, so PUBLIC vs PRIVATE doesn't matter here, but
+# PRIVATE is the right default).
+target_link_libraries(app PRIVATE greeter)

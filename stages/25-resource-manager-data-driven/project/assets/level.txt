@@ -1,0 +1,22 @@
+# Stage 25 demo level — edit this file and re-run; no rebuild needed.
+# Format:  one directive per line, '#' starts a comment, blank lines ignored.
+#   title  <text...>
+#   size   <width> <height>
+#   entity <x> <y> <texture-path>
+
+title  Resource Manager Demo
+size   640 480
+
+# Ground row — note grass.png is used FIVE times but the ResourceManager loads it ONCE.
+entity   0 416 tiles/grass.png
+entity  32 416 tiles/grass.png
+entity  64 416 tiles/grass.png
+entity  96 416 tiles/grass.png
+entity 128 416 tiles/grass.png
+
+# A couple of walls (a different texture) ...
+entity 256 384 tiles/wall.png
+entity 256 352 tiles/wall.png
+
+# ... and the player.
+entity 320 200 player.png
