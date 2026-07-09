@@ -1,0 +1,14 @@
+{
+  // Workspace extension recommendations for this course.
+  // VS Code offers to install these when you open the repo. See SETUP.md for details.
+  "recommendations": [
+    // C/C++ IntelliSense + debugging, and CMake configure/build/test/debug (bundled in one pack).
+    "ms-vscode.cpptools-extension-pack",
+    // Native lldb debugging on macOS/Linux (the debugger introduced in stage 05).
+    "vadimcn.vscode-lldb"
+    // Optional: "llvm-vs-code-extensions.vscode-clangd" for clangd IntelliSense + inline
+    // clang-tidy. If you add it, disable the C/C++ extension's IntelliSense to avoid conflicts
+    // ("C_Cpp.intelliSenseEngine": "disabled"). Left out of recommendations because it conflicts
+    // with the C/C++ extension if both are active.
+  ]
+}

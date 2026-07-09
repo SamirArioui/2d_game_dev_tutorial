@@ -19,8 +19,9 @@ compile_commands.json
 character_sheet
 a.out
 
-# Editor / OS cruft
-.vscode/
+# Editor / OS cruft — ignore personal .vscode settings but keep shared extension recommendations
+.vscode/*
+!.vscode/extensions.json
 .idea/
 .DS_Store
 

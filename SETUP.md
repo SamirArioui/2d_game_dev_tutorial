@@ -90,6 +90,36 @@ pacman -S --needed \
 
 ---
 
+## VS Code extensions (optional but recommended)
+
+If you use Visual Studio Code, install these from the Extensions view (`Cmd/Ctrl+Shift+X`) or with
+`code --install-extension <id>`:
+
+| Extension | ID | Why |
+|-----------|----|-----|
+| **C/C++** | `ms-vscode.cpptools` | IntelliSense, code navigation, and debugging for C++. |
+| **CMake Tools** | `ms-vscode.cmake-tools` | Configure / build / test / debug the CMake stages (05+) from the editor — pick a build type, hit build, launch the debugger. |
+| **CodeLLDB** | `vadimcn.vscode-lldb` | Native `lldb` debugging on macOS/Linux (the debugger you meet in stage 05); nicer than the default on macOS. |
+| **clangd** *(optional)* | `llvm-vs-code-extensions.vscode-clangd` | More accurate IntelliSense + inline `clang-tidy` warnings, driven by the `compile_commands.json` the build exports. **If you enable it, disable the C/C++ extension's IntelliSense** (`"C_Cpp.intelliSenseEngine": "disabled"`) so the two don't fight. |
+
+Shortcut: the **C/C++ Extension Pack** (`ms-vscode.cpptools-extension-pack`) bundles C/C++ + CMake
+Tools in one install.
+
+Notes:
+- The root `CMakeLists.txt` sets `CMAKE_EXPORT_COMPILE_COMMANDS`, so a `compile_commands.json` is
+  produced when you configure — this is what powers accurate IntelliSense (especially with clangd).
+- Formatting/linting: the C/C++ extension formats with `clang-format` out of the box (it picks up
+  the repo's `.clang-format`); clangd applies the repo's `.clang-tidy`. Enable
+  `"editor.formatOnSave": true` to auto-format on save (the C++ `black`-on-save equivalent).
+- On **Windows**, if you'd rather stay in full Visual Studio 2022, you don't need any of these —
+  VS already provides IntelliSense, the CMake integration, and the debugger.
+
+This repo ships a `.vscode/extensions.json` listing these as **workspace recommendations** — when
+you open the folder, VS Code offers to install them in one click. Personal editor settings
+(`.vscode/settings.json`, etc.) are intentionally left uncommitted.
+
+---
+
 ## Building a stage
 
 **Stages 00–04** are plain single-/multi-file programs you compile directly (each README shows
