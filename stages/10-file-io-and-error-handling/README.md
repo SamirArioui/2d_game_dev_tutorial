@@ -251,8 +251,8 @@ cmake -S project/solution -B build-solution && cmake --build build-solution
 cd build-solution && ./stage10_save_load
 ```
 
-This `SaveData` + `load()` shape is a **course contract**: the capstone (stage 27) reuses this exact
-save/load design.
+This `SaveData` + `load()` shape is a recurring **course pattern**: the capstone (stage 27) reuses a
+similar save/load design.
 
 ---
 

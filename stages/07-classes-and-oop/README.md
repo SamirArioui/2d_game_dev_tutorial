@@ -49,7 +49,7 @@ Two differences you feel immediately:
 - **There is no `self`.** Inside a method you name members directly (`hp_`), or write
   `this->hp_` if you need to be explicit. `this` is a *pointer* to the current object.
 - **Access is enforced, not suggested.** Members are `private` by default in a `class`
-  (`public` in a `struct` — that's the *only* language-level difference between the two
+  (`public` in a `struct` — the only difference in default *member* access between the two
   keywords). Python's leading-underscore `_hp` is a convention the runtime ignores; C++'s
   `private` is checked by the compiler.
 

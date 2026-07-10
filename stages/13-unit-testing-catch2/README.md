@@ -188,7 +188,7 @@ your job is to implement the function until `ctest` goes green.
 
 The flip side is the **planted-bug hunt** (exercise 06): a correct test paired with buggy code. The
 test fails, points at the exact wrong value, you fix the code, it passes. That is precisely what a
-test suite does for you every day — it turns "I think I broke something" into "line 24, expected
+test suite does for you every day — it turns "I think I broke something" into "line 28, expected
 15, got 25".
 
 ---

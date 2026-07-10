@@ -5,7 +5,7 @@
 // Complete reference. The starter you implement is two levels up
 // (../../include/res/resource_manager.hpp and ../../src/level_config.cpp). Build this standalone
 // (it has its own CMakeLists.txt); run from this folder so assets/ resolves:
-//   cmake -S project/solution -B build && cmake --build build && ./build/tilemap_demo
+//   cmake -S project/solution -B build && cmake --build build && ./build/resource_demo
 //
 // Nothing about this level is hardcoded: main() reads assets/level.txt into a LevelConfig, then
 // asks a ResourceManager<sf::Texture> for each entity's texture. Repeated texture paths (the whole
@@ -18,7 +18,7 @@
 //
 // Verified to BUILD and LINK. Run it from THIS folder (so "assets/..." resolves):
 //   cmake -S . -B build && cmake --build build
-//   ./build/tilemap_demo
+//   ./build/resource_demo
 // ============================================================================
 
 #include <iostream>

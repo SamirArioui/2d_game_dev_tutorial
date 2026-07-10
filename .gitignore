@@ -27,3 +27,5 @@ a.out
 
 # Local run artifacts (e.g. save files written by later stages)
 *.log
+savegame.txt
+*.save

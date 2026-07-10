@@ -4,14 +4,14 @@
 #   - level_logic : the pure config parser (level_config.cpp). ResourceManager<T> is a header-only
 #                   template (include/res/). Both are SFML-free and link into the tests.
 #   - tests       : Catch2 over the manager's caching and the parser. No SFML, no display.
-#   - tilemap_demo: the SFML app that loads assets/level.txt and draws it (needs a display to run).
+#   - resource_demo: the SFML app that loads assets/level.txt and draws it (needs a display to run).
 #
 # Tests only (fast):
 #   cmake -S . -B build -DBUILD_APP=OFF && cmake --build build
 #   ctest --test-dir build --output-on-failure
 #
 # Everything (first run clones SFML — needs network); run from THIS folder so assets/ resolves:
-#   cmake -S . -B build && cmake --build build && ./build/tilemap_demo
+#   cmake -S . -B build && cmake --build build && ./build/resource_demo
 # ============================================================================
 
 cmake_minimum_required(VERSION 3.16)
@@ -60,6 +60,6 @@ if(BUILD_APP)
     set(SFML_BUILD_NETWORK OFF CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(SFML)
 
-    add_executable(tilemap_demo src/main.cpp)
-    target_link_libraries(tilemap_demo PRIVATE level_logic sfml-graphics sfml-window sfml-system)
+    add_executable(resource_demo src/main.cpp)
+    target_link_libraries(resource_demo PRIVATE level_logic sfml-graphics sfml-window sfml-system)
 endif()

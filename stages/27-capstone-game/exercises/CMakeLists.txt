@@ -37,9 +37,9 @@ include(Catch)
 # A small static lib of the SFML-free game logic, shared by every drill. It pulls
 # in the engine's tilemap.cpp (also SFML-free) that world.cpp depends on.
 add_library(capstone_logic STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../project/src/inventory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../project/src/save_data.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../project/src/world.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../project/solution/src/inventory.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../project/solution/src/save_data.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../project/solution/src/world.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../engine/src/tilemap.cpp
 )
 target_include_directories(capstone_logic PUBLIC

@@ -134,9 +134,9 @@ float damage_multiplier(DamageType type) {
   another enum. You always write `DamageType::Fire`. A plain `enum` dumps its names into the
   surrounding scope.
 - **Typed.** It will **not** implicitly convert to `int`. `int n = DamageType::Fire;` is an error;
-  you must ask on purpose with `static_cast<int>(DamageType::Fire)` (which gives `0, 1, 2, …` by
-  declaration order). That stops a whole category of "I accidentally did arithmetic on an enum"
-  bugs.
+  you must ask on purpose with `static_cast<int>(DamageType::Physical)` — the values run `0, 1, 2, …`
+  in declaration order, so `Physical`→`0`, `Fire`→`1`, `Ice`→`2`. That stops a whole category of "I
+  accidentally did arithmetic on an enum" bugs.
 
 Python's closest analogue is `enum.Enum`. `enum class` is the course default from here on.
 

@@ -194,7 +194,7 @@ cd exercises
 clang++ -std=c++17 -Wall -Wextra 01_grid_index.solution.cpp -o ex && ./ex
 # uses the Tilemap class (compile the pure source alongside):
 clang++ -std=c++17 -Wall -Wextra -I ../project/include \
-    ../project/src/tilemap.cpp 03_count_solid.solution.cpp -o ex && ./ex
+    ../project/solution/src/tilemap.cpp 03_count_solid.solution.cpp -o ex && ./ex
 ```
 
 Each program asserts its own results and prints `all checks passed`.

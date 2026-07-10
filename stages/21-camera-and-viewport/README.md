@@ -168,7 +168,7 @@ cd exercises
 clang++ -std=c++17 -Wall -Wextra 01_clamp_scalar.solution.cpp -o ex && ./ex
 clang++ -std=c++17 -Wall -Wextra -I ../project/include 02_screen_to_world.solution.cpp -o ex && ./ex
 clang++ -std=c++17 -Wall -Wextra -I ../project/include \
-    ../project/src/camera.cpp 03_clamp_view.solution.cpp -o ex && ./ex
+    ../project/solution/src/camera.cpp 03_clamp_view.solution.cpp -o ex && ./ex
 ```
 
 Each program asserts its own results and prints `all checks passed`.

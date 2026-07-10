@@ -245,7 +245,7 @@ on purpose — and proves the file still *compiles* (`-c`) even though it won't 
 
 In [`exercises/`](exercises/). Ordered easy → hard. Some span multiple files: a starter
 `NN_name.cpp` (the file **you** edit) plus its `NN_name.solution.cpp`, and — where noted —
-**support files** (`.hpp` / `*_main.cpp`) that are already complete and marked *"do NOT edit."*
+**support files** (`.hpp` / `*_main.cpp` / `*_lib.cpp`) that are already complete and marked *"do NOT edit."*
 Compile the support files *alongside* the exercise (each exercise's header comment shows the exact
 command).
 
@@ -274,7 +274,7 @@ clang++ -std=c++17 -Wall -Wextra 02_split_across_files.cpp 02_split_across_files
 ## Your task — split the game-math library
 
 **You implement it.** [`project/src/`](project/src/) is a **starter** that combines **every**
-concept from this stage across **four translation units and three headers**:
+concept from this stage across **three translation units and two headers**:
 
 ```
 project/src/

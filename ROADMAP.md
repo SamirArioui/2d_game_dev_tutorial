@@ -115,7 +115,7 @@ Ideas introduced once and then reinforced in every later stage, rather than taug
 | 24 | [Scenes, state machine, input & events](stages/24-scenes-state-input-events/) | `GameState`, state machine, scene stack, input action mapping, `std::function` event system | Menu/Playing/GameOver scenes |
 | 25 | [Resource manager & data-driven design](stages/25-resource-manager-data-driven/) | templated `ResourceManager<T>` + caching; load level/entity config from files | assets/config through the manager |
 | 26 | [Extract the engine](stages/26-extract-the-engine/) | pull subsystems into `libengine` (static lib), main-loop ownership, `namespace eng` | port Pong onto `libengine` |
-| 27 | [Capstone game](stages/27-capstone-game/) | apply the whole engine to a bigger genre | top-down/platformer on `libengine` + inventory + save/load |
+| 27 | [Capstone game](stages/27-capstone-game/) | apply the whole engine to a bigger genre | top-down on `libengine` + inventory + save/load |
 
 > **Out of scope, by design** (so their absence reads as a decision, not an oversight):
 > threading/concurrency, networking/multiplayer, spatial-partition broadphase (quadtree/grid —

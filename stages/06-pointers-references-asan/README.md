@@ -155,13 +155,13 @@ Run the deliberately-buggy exercise 06 and you get a report like this (trimmed):
 ```
 ==NNN==ERROR: AddressSanitizer: heap-use-after-free on address 0x... 
 READ of size 4 at 0x... thread T0
-    #0 ... in main   06_use_after_free.cpp:38      <-- WHERE you touched freed memory
+    #0 ... in main   06_use_after_free.cpp:40      <-- WHERE you touched freed memory
 freed by thread T0 here:
     #0 ... operator delete
-    #1 ... in main   06_use_after_free.cpp:34      <-- WHERE you called delete
+    #1 ... in main   06_use_after_free.cpp:36      <-- WHERE you called delete
 previously allocated by thread T0 here:
     #0 ... operator new
-    #1 ... in main   06_use_after_free.cpp:31      <-- WHERE you called new
+    #1 ... in main   06_use_after_free.cpp:34      <-- WHERE you called new
 SUMMARY: AddressSanitizer: heap-use-after-free ... in main
 ```
 

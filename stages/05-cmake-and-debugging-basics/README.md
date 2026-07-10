@@ -167,7 +167,7 @@ Breakpoint 1: where = mathgame`clamp(float, float, float) + 16 at mathutils.cpp:
 
 (lldb) bt                                              # backtrace: who called whom
   * frame #0: mathgame`clamp(value=48, lo=0, hi=30) at mathutils.cpp:14:5
-    frame #1: mathgame`main at main.cpp:33:14           # clamp was called from main, line 33
+    frame #1: mathgame`main at main.cpp:36:9            # clamp was called from main, line 36
 
 (lldb) continue                                        # let the program finish
 Process ... exited with status = 0
@@ -176,7 +176,7 @@ Process ... exited with status = 0
 
 Two things to notice. The breakpoint report already shows the arguments — `clamp(value=48, lo=0,
 hi=30)` — so you can often see the bug before typing anything. And `bt` gives you the *path* that
-led here (`clamp` ← `main:33`), which is invaluable when a function is called from many places.
+led here (`clamp` ← `main:36`), which is invaluable when a function is called from many places.
 **Exercise 03** is a planted bug you'll find this way (watch a variable that never changes).
 
 ---

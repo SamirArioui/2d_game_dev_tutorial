@@ -184,7 +184,7 @@ ctest --test-dir build --output-on-failure        # 8 tests — RED until you im
 # --- Full path: also build the SFML demo ---
 cmake -S . -B build
 cmake --build build
-./build/tilemap_demo        # run from THIS folder so "assets/..." resolves
+./build/resource_demo       # run from THIS folder so "assets/..." resolves
 ```
 
 The bundled `assets/` (a `level.txt` and three tiny solid-colour PNGs) makes the demo

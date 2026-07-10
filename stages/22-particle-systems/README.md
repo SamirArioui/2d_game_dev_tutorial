@@ -169,7 +169,7 @@ source, so compile it alongside:
 cd exercises
 clang++ -std=c++17 -Wall -Wextra 01_lifetime.solution.cpp -o ex && ./ex
 clang++ -std=c++17 -Wall -Wextra -I ../project/include \
-    ../project/src/particle_pool.cpp 02_spawn_cap.solution.cpp -o ex && ./ex
+    ../project/solution/src/particle_pool.cpp 02_spawn_cap.solution.cpp -o ex && ./ex
 ```
 
 Each program asserts its own results and prints `all checks passed`.

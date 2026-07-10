@@ -2,7 +2,7 @@
 //
 // This is the STARTER. Implement it yourself using what the README taught: this file
 // #includes only the two HEADERS (declarations); you write the DEFINITIONS in
-// mathutils.cpp and player.cpp, and the LINKER stitches all four translation units
+// mathutils.cpp and player.cpp, and the LINKER stitches all three translation units
 // together. That is the whole point of the stage: compile each .cpp separately, then link.
 //
 // A complete reference is in ../solution/src/ — try it yourself first, then compare.

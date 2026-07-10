@@ -3,7 +3,7 @@
 // This is the complete reference implementation. The starter you fill in is two levels up
 // at ../../src/ (project/src/). Try it yourself there first, then compare with this.
 //
-// It ties together THREE headers over FOUR translation units:
+// It ties together TWO headers over THREE translation units:
 //   - mathutils.hpp / mathutils.cpp  (clamp / lerp / distance)
 //   - player.hpp    / player.cpp     (the shared Player type + print_player)
 //   - this file                      (main)

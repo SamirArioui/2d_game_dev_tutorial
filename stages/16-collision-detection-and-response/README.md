@@ -35,7 +35,7 @@ carries the `Hit`. The caller writes:
 
 ```cpp
 if (auto hit = aabb_vs_aabb(a, b)) {   // like `if (h := aabb_vs_aabb(a,b)) is not None`
-    resolve(a, b, *hit);
+    resolve_pair(a, b, *hit);
 }
 ```
 
@@ -212,7 +212,7 @@ Try each yourself before peeking at the `.solution.cpp`.
 **Your task.** In [`project/`](project/). The SFML scaffolding — the window, the event loop, the
 per-frame move/wall-bounce/pairwise-resolve glue and all the drawing in
 [`src/main.cpp`](project/src/main.cpp) — is complete. What's missing is the **collision maths** in
-[`include/collision.hpp`](project/include/collision.hpp): the four predicates `aabb_vs_aabb`,
+[`include/collision.hpp`](project/include/collision.hpp): the three detectors `aabb_vs_aabb`,
 `circle_vs_circle`, `circle_vs_aabb` and `reflect_velocity` ship as `// TODO(stage 16)` stubs, so
 the app builds and links but nothing collides and [`tests/test_collision.cpp`](project/tests/test_collision.cpp)
 starts **RED**. Implement each function (the header comments walk through the maths) and drive the

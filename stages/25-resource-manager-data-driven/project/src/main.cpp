@@ -12,7 +12,7 @@
 //
 // Verified to BUILD and LINK. Run it from THIS folder (so "assets/..." resolves):
 //   cmake -S . -B build && cmake --build build
-//   ./build/tilemap_demo
+//   ./build/resource_demo
 // ============================================================================
 
 #include <iostream>
