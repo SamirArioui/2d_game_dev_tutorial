@@ -11,7 +11,7 @@ New here? Read [`SETUP.md`](SETUP.md) first (install a compiler + CMake), skim
 [`STYLE.md`](STYLE.md) (coding conventions), then start at
 [`stages/00-hello-cpp/`](stages/00-hello-cpp/).
 
-**28 stages (00–27), five phases.** Stages 00–04 compile by hand with `clang++`; 05 onward use
+**28 stages (00–27), eight phases (A–H).** Stages 00–04 compile by hand with `clang++`; 05 onward use
 CMake; 13 onward can run unit tests with Catch2 + `ctest`; 14 onward pull SFML (and Dear ImGui at
 19) via CMake `FetchContent`.
 
