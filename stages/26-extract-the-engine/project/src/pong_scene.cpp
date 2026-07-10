@@ -1,3 +1,21 @@
+// ============================================================================
+// Stage 26 mini-project — PongScene (implementation) — YOUR TASK
+// ============================================================================
+//
+// This is the STARTER. Implement the eng::Scene that turns the pure pong:: rules
+// into a playable game, using the engine subsystems the header lists: eng::InputMap
+// for named actions, eng::make_*_texture for procedural sprites, eng::make_tone for
+// the beeps, and eng::load_system_font for the score text. The ENGINE is provided
+// and complete — your job is to write this GAME layer on top of it.
+//
+// The class definition (members + method signatures) is in pong_scene.hpp. The
+// starter already compiles and links (each body has a placeholder), so the `pong`
+// executable builds — but it won't play correctly until you fill the TODOs in.
+// (The pure rules in pong_logic.cpp are the other half of your task, and are what
+// the unit tests cover.)
+//
+// A complete reference is in ../solution/src/pong_scene.cpp — try it yourself first.
+// ============================================================================
 #include "pong_scene.hpp"
 
 #include <string>
@@ -9,102 +27,43 @@
 namespace pong {
 
 PongScene::PongScene(const Config& config) : config_(config), state_(make_initial(config)) {
-    // --- Input: name the ACTIONS, bind keys once. Left player W/S, right Up/Down.
-    input_.bind("left_up", sf::Keyboard::W);
-    input_.bind("left_down", sf::Keyboard::S);
-    input_.bind("right_up", sf::Keyboard::Up);
-    input_.bind("right_down", sf::Keyboard::Down);
-
-    // --- Sprites from procedurally generated textures (no image files).
-    paddle_texture_ = eng::make_solid_texture(static_cast<unsigned>(config_.paddle_w),
-                                              static_cast<unsigned>(config_.paddle_h),
-                                              sf::Color::White);
-    ball_texture_ = eng::make_circle_texture(static_cast<unsigned>(config_.ball_size),
-                                             sf::Color(240, 240, 120));
-    left_paddle_.setTexture(paddle_texture_);
-    right_paddle_.setTexture(paddle_texture_);
-    ball_.setTexture(ball_texture_);
-
-    // --- Audio: two synthesized beeps. Buffers are members; sounds point at them.
-    bounce_buffer_ = eng::make_tone(520.0f, 0.06f);
-    score_buffer_ = eng::make_tone(180.0f, 0.25f);
-    bounce_sound_.setBuffer(bounce_buffer_);
-    score_sound_.setBuffer(score_buffer_);
-
-    // --- Text: only if a font was found; otherwise we render without a score.
-    font_ok_ = eng::load_system_font(font_);
-    if (font_ok_) {
-        score_text_.setFont(font_);
-        score_text_.setCharacterSize(48);
-        score_text_.setFillColor(sf::Color::White);
-        refresh_score_text();
-    }
+    // TODO(stage 26): set the scene up:
+    //   - bind the four actions "left_up"/"left_down"/"right_up"/"right_down" to
+    //     W/S and Up/Down with input_.bind(...).
+    //   - build paddle_texture_ / ball_texture_ with eng::make_solid_texture /
+    //     eng::make_circle_texture, then setTexture() on the three sprites.
+    //   - synthesize bounce_buffer_ / score_buffer_ with eng::make_tone and point
+    //     bounce_sound_ / score_sound_ at them (setBuffer).
+    //   - font_ok_ = eng::load_system_font(font_); if found, style score_text_
+    //     (size/colour) and call refresh_score_text().
 }
 
 void PongScene::refresh_score_text() {
-    if (!font_ok_) {
-        return;
-    }
-    score_text_.setString(std::to_string(state_.left_score) + "   :   " +
-                          std::to_string(state_.right_score));
-    // Re-centre horizontally now that the string width may have changed.
-    const sf::FloatRect bounds = score_text_.getLocalBounds();
-    score_text_.setOrigin(bounds.left + bounds.width * 0.5f, 0.0f);
-    score_text_.setPosition(config_.court_w * 0.5f, 12.0f);
+    // TODO(stage 26): if font_ok_, set score_text_ to "<left>   :   <right>",
+    // re-centre it horizontally (getLocalBounds + setOrigin) and position it at the
+    // top-middle of the court.
 }
 
 void PongScene::update(float dt) {
-    // Turn the two input axes into paddle motion, then advance the pure rules.
-    const float move_left = input_.axis("left_up", "left_down");
-    const float move_right = input_.axis("right_up", "right_down");
-
-    const Event event = step(state_, config_, dt, move_left, move_right);
-
-    // React to what happened — the ONLY place gameplay touches the outside world.
-    switch (event) {
-        case Event::WallBounce:
-        case Event::PaddleBounce:
-            bounce_sound_.play();
-            break;
-        case Event::ScoreLeft:
-        case Event::ScoreRight:
-            score_sound_.play();
-            refresh_score_text();
-            break;
-        case Event::None:
-            break;
-    }
+    // TODO(stage 26): read the two paddle axes with input_.axis("left_up",
+    // "left_down") / ("right_up","right_down"), advance the rules with
+    // pong::step(state_, config_, dt, move_left, move_right), then react to the
+    // returned Event: play bounce_sound_ on a wall/paddle bounce, or score_sound_ +
+    // refresh_score_text() on a score.
+    (void)dt;
 }
 
 void PongScene::render(sf::RenderTarget& target) {
-    left_paddle_.setPosition(config_.paddle_margin, state_.left_paddle_y);
-    right_paddle_.setPosition(config_.court_w - config_.paddle_margin - config_.paddle_w,
-                              state_.right_paddle_y);
-    ball_.setPosition(state_.ball_pos.x, state_.ball_pos.y);
-
-    // A dashed centre line, drawn as a few faint rectangles.
-    sf::RectangleShape dash(sf::Vector2f(4.0f, 18.0f));
-    dash.setFillColor(sf::Color(80, 80, 100));
-    for (float y = 0.0f; y < config_.court_h; y += 34.0f) {
-        dash.setPosition(config_.court_w * 0.5f - 2.0f, y);
-        target.draw(dash);
-    }
-
-    target.draw(left_paddle_);
-    target.draw(right_paddle_);
-    target.draw(ball_);
-    if (font_ok_) {
-        target.draw(score_text_);
-    }
+    // TODO(stage 26): position the paddle/ball sprites from state_ + config_, draw
+    // the dashed centre line, draw the three sprites, and (if font_ok_) the score.
+    (void)target;
 }
 
 void PongScene::handle_input(const sf::Event& event) {
-    // Press R to reset the match. (Quitting is handled by the window's close
-    // button, which eng::Application turns into shutdown.)
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
-        state_ = make_initial(config_);
-        refresh_score_text();
-    }
+    // TODO(stage 26): on a KeyPressed of R, reset the match
+    // (state_ = make_initial(config_)) and refresh_score_text(). Window close is
+    // handled for you by eng::Application.
+    (void)event;
 }
 
 }  // namespace pong

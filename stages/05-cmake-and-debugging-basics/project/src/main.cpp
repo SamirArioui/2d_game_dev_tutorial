@@ -1,12 +1,26 @@
-// main.cpp — the mini-project driver.
+// main.cpp — the mini-project driver.  (YOUR TASK)
 //
-// It ties together THREE headers over FOUR translation units:
-//   - mathutils.hpp / mathutils.cpp  (clamp / lerp / distance)
-//   - player.hpp    / player.cpp     (the shared Player type + print_player)
-//   - this file                      (main)
+// This is the STARTER — the same program you split in stage 04, now built by CMake. Implement
+// it yourself: fill in main() here AND the bodies in mathutils.cpp / player.cpp, then let the
+// CMakeLists.txt one level up compile the three translation units and link them for you.
 //
-// This is the same program you split by hand in stage 04 — but now CMake compiles the three
-// translation units and links them for you (see the CMakeLists.txt one level up).
+// A complete reference is in ../solution/ — try it yourself first, then compare.
+//
+// GOAL — once every TODO is done, the program should print exactly this:
+//
+//   === Stage 05 — the stage-04 program, built with CMake ===
+//
+//   Party:
+//     Aria the Bold (hp 8)
+//
+//   A +40 potion would clamp HP to 30 (max is 30, so the overheal is discarded).
+//
+//   Healing 8 -> 30 over 5 frames (lerp):
+//     frame 0: hp = 8
+//     ...
+//     frame 5: hp = 30
+//
+//   Distance to chest: 5
 //
 // Build & run (from the project/ folder):
 //   cmake -S . -B build
@@ -18,36 +32,18 @@
 #include "player.hpp"
 
 int main() {
-    std::cout << "=== Stage 05 — the stage-04 program, built with CMake ===\n\n";
+    // TODO(stage 05): print the banner "=== Stage 05 — the stage-04 program, built with CMake ===\n\n".
 
-    // --- The shared Player type: constructed here in main, printed by player.cpp. ---
-    Player hero{"Aria the Bold", 8};   // wounded: 8 out of a possible 30 HP
-    const int max_hp = 30;
+    // TODO(stage 05): construct the shared Player `hero` ("Aria the Bold", hp 8) and a
+    // `const int max_hp = 30;`. Print "Party:\n", then call print_player(hero).
 
-    std::cout << "Party:\n";
-    print_player(hero);
+    // TODO(stage 05): clamp — a +40 potion heals, but HP can never exceed max_hp. Use
+    // clamp(hero.hp + potion, 0, max_hp) (cast to/from float) and report the clamped value.
 
-    // clamp: a big potion heals +40, but HP can never exceed max_hp (no overheal).
-    const int potion = 40;
-    const int healed = static_cast<int>(
-        clamp(static_cast<float>(hero.hp + potion), 0.0f, static_cast<float>(max_hp)));
-    std::cout << "\nA +" << potion << " potion would clamp HP to " << healed << " (max is "
-              << max_hp << ", so the overheal is discarded).\n";
+    // TODO(stage 05): lerp — ease a healing animation from hero.hp up to max_hp over 5
+    // frames. Loop frame = 0..5, t = frame / 5.0f, print lerp(hero.hp, max_hp, t) each frame.
 
-    // lerp: ease a healing animation from current HP up to full over 5 frames.
-    std::cout << "\nHealing " << hero.hp << " -> " << max_hp << " over 5 frames (lerp):\n";
-    for (int frame = 0; frame <= 5; ++frame) {
-        const float t = static_cast<float>(frame) / 5.0f;
-        const float hp = lerp(static_cast<float>(hero.hp), static_cast<float>(max_hp), t);
-        std::cout << "  frame " << frame << ": hp = " << hp << "\n";
-    }
+    // TODO(stage 05): distance — print distance((2,1), (5,5)) using the distance() function.
 
-    // distance: how far is the hero (2, 1) from a treasure chest at (5, 5)?
-    const float hero_x = 2.0f;
-    const float hero_y = 1.0f;
-    const float chest_x = 5.0f;
-    const float chest_y = 5.0f;
-    std::cout << "\nDistance to chest: " << distance(hero_x, hero_y, chest_x, chest_y) << "\n";
-
-    return 0;
+    return 0;  // success — leave this last
 }

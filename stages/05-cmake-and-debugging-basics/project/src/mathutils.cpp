@@ -8,22 +8,27 @@
 #include <cmath>   // std::sqrt
 
 float clamp(float value, float lo, float hi) {
-    if (value < lo) {
-        return lo;
-    }
-    if (value > hi) {
-        return hi;
-    }
-    return value;
+    // TODO(stage 05): return `value` forced into the inclusive range [lo, hi]
+    // (return lo if it's below, hi if it's above, otherwise value unchanged).
+    (void)value;
+    (void)lo;
+    (void)hi;
+    return 0.0f;  // placeholder so the starter links; replace with the real result
 }
 
 float lerp(float a, float b, float t) {
-    // At t = 0 this is a; at t = 1 it is b; values in between slide along the line.
-    return a + (b - a) * t;
+    // TODO(stage 05): linear interpolation — a at t = 0, b at t = 1, straight line between.
+    (void)a;
+    (void)b;
+    (void)t;
+    return 0.0f;  // placeholder
 }
 
 float distance(float x1, float y1, float x2, float y2) {
-    const float dx = x2 - x1;
-    const float dy = y2 - y1;
-    return std::sqrt(dx * dx + dy * dy);
+    // TODO(stage 05): Euclidean distance between (x1, y1) and (x2, y2) — use std::sqrt.
+    (void)x1;
+    (void)y1;
+    (void)x2;
+    (void)y2;
+    return 0.0f;  // placeholder
 }

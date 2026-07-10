@@ -1,5 +1,11 @@
 // ============================================================================
-// AABB overlap test + penetration (minimum translation vector).
+// AABB overlap test + penetration (minimum translation vector).  (YOUR TASK)
+//
+// This is the STARTER — the same overlap test you built in stage 16, carried
+// here so Pong is self-contained. Implement the body below so
+// tests/test_collision.cpp goes GREEN and ball_hits_paddle() works.
+//
+// A complete reference is in ../solution/src/aabb.cpp — try it yourself first.
 // ============================================================================
 #include "collision/aabb.hpp"
 
@@ -8,38 +14,18 @@
 namespace collision {
 
 std::optional<Hit> aabb_vs_aabb(const AABB& a, const AABB& b) {
-    const float a_left = a.pos.x;
-    const float a_right = a.pos.x + a.size.x;
-    const float a_top = a.pos.y;
-    const float a_bottom = a.pos.y + a.size.y;
-
-    const float b_left = b.pos.x;
-    const float b_right = b.pos.x + b.size.x;
-    const float b_top = b.pos.y;
-    const float b_bottom = b.pos.y + b.size.y;
-
-    // Overlap length on each axis. If either is <= 0 the boxes don't overlap
-    // (== 0 means they merely touch, which we treat as "not colliding").
-    const float overlap_x = std::min(a_right, b_right) - std::max(a_left, b_left);
-    const float overlap_y = std::min(a_bottom, b_bottom) - std::max(a_top, b_top);
-
-    if (overlap_x <= 0.0f || overlap_y <= 0.0f) {
-        return std::nullopt;
-    }
-
-    // Direction to push `a` OUT of `b`: away from b's center. If a's center is
-    // left of b's, push a further left (negative x), and so on.
-    const float a_center_x = a.pos.x + a.size.x * 0.5f;
-    const float a_center_y = a.pos.y + a.size.y * 0.5f;
-    const float b_center_x = b.pos.x + b.size.x * 0.5f;
-    const float b_center_y = b.pos.y + b.size.y * 0.5f;
-
-    const float dir_x = (a_center_x < b_center_x) ? -1.0f : 1.0f;
-    const float dir_y = (a_center_y < b_center_y) ? -1.0f : 1.0f;
-
-    // Penetration = signed overlap on each axis. The caller resolves along the
-    // component with the smaller magnitude (the shallower axis).
-    return Hit{gmath::Vec2f{overlap_x * dir_x, overlap_y * dir_y}};
+    // TODO(stage 18, from stage 16): return whether boxes `a` and `b` overlap,
+    // and if so the penetration (minimum translation) vector.
+    //   * each box spans [pos, pos + size] on x and y.
+    //   * overlap_x = min(a_right, b_right) - max(a_left, b_left); overlap_y
+    //     likewise. If EITHER is <= 0 the boxes don't overlap (== 0 = merely
+    //     touching, which counts as NO collision) -> return std::nullopt.
+    //   * otherwise push `a` away from b's centre: dir_x = (a_center_x <
+    //     b_center_x) ? -1 : +1 (same for y), and return
+    //     Hit{ {overlap_x * dir_x, overlap_y * dir_y} }.
+    (void)a;
+    (void)b;
+    return std::nullopt;  // placeholder
 }
 
 }  // namespace collision

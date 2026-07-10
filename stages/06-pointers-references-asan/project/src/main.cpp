@@ -1,25 +1,31 @@
 // ============================================================================
 // Stage 06 mini-project — pointer swap + a heap-allocated singly linked list
+//                                                                  (YOUR TASK)
 // ============================================================================
-// Combines every idea from this stage:
+//
+// This is the STARTER. Implement it yourself, combining everything from this stage:
 //   - pointers (Node*) and references (Node*& / int&)
 //   - nullptr as both the end-of-list marker and the empty-list value
 //   - new / delete to build and tear down nodes on the heap
 //   - a pointer-based swap
-//   - clean ownership: every `new` has a matching `delete`, so this program is SILENT under
-//     AddressSanitizer. A correct program produces NO ASan report — that is the point.
+//   - clean ownership: every `new` has a matching `delete`, so a CORRECT program is SILENT
+//     under AddressSanitizer. A correct program produces NO ASan report — that is the point.
 //
-// A singly linked list is a chain of heap nodes, each holding a value and a pointer to the
-// next node; the last node points at nullptr. Python's `list` is a dynamic array, not a
-// linked list, and it hides this pointer-chasing entirely — here you own every link.
+// The four functions below (swap_ints, push_front, print_list, free_list) are stubbed with
+// TODOs. Fill them in; main() already drives the demo and should not need changing.
 //
-// Build & run (plain):
+// A complete reference is in ../solution/src/main.cpp — try it yourself first.
+//
+// Build & run (under AddressSanitizer — ON by default for this stage):
 //   cmake -S . -B build && cmake --build build
 //   ./build/swap_and_list
 //
-// Build & run (under AddressSanitizer — ON by default for this stage):
-//   the ENABLE_ASAN option defaults to ON, so this binary is ALREADY instrumented.
-//   A clean run prints the list and exits with no ASan error.
+// GOAL — once implemented, the program prints exactly:
+//   before swap: a=7 b=99
+//   after  swap: a=99 b=7
+//
+//   list:       [1 -> 2 -> 3]
+//   after free: []
 // ============================================================================
 
 #include <iostream>
@@ -32,42 +38,31 @@ struct Node {
 
 // Swap two ints through pointers (the stage's pointer-swap requirement).
 void swap_ints(int* a, int* b) {
-    int tmp = *a;
-    *a = *b;
-    *b = tmp;
+    // TODO(stage 06): swap the two ints THROUGH the pointers — read/write with `*a` and `*b`,
+    // using a temporary so no value is lost.
 }
 
 // Add a new node holding `value` at the FRONT of the list. We take the head pointer BY
 // REFERENCE (Node*&) so we can re-seat the caller's head to the new node.
 void push_front(Node*& head, int value) {
-    Node* node = new Node{value, head};   // the new node points at the old head
-    head = node;                          // head now points at the new node
+    // TODO(stage 06): allocate a `new Node{value, head}` (it points at the old head), then
+    // re-seat `head` to the new node.
 }
 
 // Walk the chain from head to nullptr, printing each value. `const Node*` because traversal
 // doesn't modify the nodes; we take head BY VALUE (a copy of the pointer) so advancing our
 // local cursor doesn't disturb the caller's head.
 void print_list(const Node* head) {
-    std::cout << "[";
-    for (const Node* cur = head; cur != nullptr; cur = cur->next) {
-        std::cout << cur->value;
-        if (cur->next != nullptr) {
-            std::cout << " -> ";
-        }
-    }
-    std::cout << "]\n";
+    // TODO(stage 06): print "[", then each value walking cur = head; cur != nullptr;
+    // cur = cur->next, separating values with " -> ", then a closing "]\n". An empty list
+    // should print "[]".
 }
 
 // Free every node. This is the manual version of what a destructor does automatically in
 // stage 07 and a smart pointer does in stage 11. Skip it and you leak the whole chain.
 void free_list(Node*& head) {
-    Node* cur = head;
-    while (cur != nullptr) {
-        Node* next = cur->next;   // grab next BEFORE deleting cur (else that read is a UAF)
-        delete cur;
-        cur = next;
-    }
-    head = nullptr;               // the list is now empty
+    // TODO(stage 06): walk the chain, and for each node grab cur->next BEFORE `delete cur`
+    // (reading it afterwards would be a use-after-free). Finally set head = nullptr.
 }
 
 int main() {

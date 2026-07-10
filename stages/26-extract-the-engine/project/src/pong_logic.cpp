@@ -1,99 +1,87 @@
+// ============================================================================
+// Stage 26 mini-project — Pong RULES (implementation) — YOUR TASK
+// ============================================================================
+//
+// This is the STARTER. Implement the pure Pong rules declared in pong_logic.hpp
+// using what the stage taught: plain data + free functions over gmath, reusing
+// the engine's gmath::aabb_vs_aabb for the paddle bounces. NO SFML belongs here —
+// that is the whole point of the pure/impure seam, and it is why the tests can
+// drive these functions completely headless.
+//
+// The Config/State/Event types and the declarations you implement against are in
+// pong_logic.hpp. The starter already compiles and links (each body has a
+// placeholder), so `pong` and `pong_tests` build — but the pong tests in tests/
+// are RED until you fill the TODOs in.
+//
+// A complete reference is in ../solution/src/pong_logic.cpp — try it yourself first.
+//
+// Build & test (from stages/26-extract-the-engine/project):
+//   cmake -S . -B build && cmake --build build
+//   ctest --test-dir build --output-on-failure
+// ============================================================================
 #include "pong_logic.hpp"
 
 #include <cmath>
 
 namespace pong {
 
-namespace {
-
-// Re-serve the ball from the centre. `dir_x` is +1 (serve rightward) or -1
-// (leftward). Vertical speed is a fixed fraction so behaviour is deterministic
-// (important: the unit tests rely on knowing exactly what a reset does).
-void reset_ball(State& s, const Config& c, float dir_x) {
-    s.ball_pos = gmath::Vec2f{(c.court_w - c.ball_size) * 0.5f, (c.court_h - c.ball_size) * 0.5f};
-    s.ball_vel = gmath::Vec2f{dir_x * c.ball_speed, c.ball_speed * 0.3f};
-}
-
-}  // namespace
-
 State make_initial(const Config& c) {
-    State s;
-    s.left_paddle_y = (c.court_h - c.paddle_h) * 0.5f;
-    s.right_paddle_y = (c.court_h - c.paddle_h) * 0.5f;
-    reset_ball(s, c, -1.0f);  // first serve goes left
-    s.left_score = 0;
-    s.right_score = 0;
-    return s;
+    // TODO(stage 26): build a fresh match state:
+    //   - centre both paddles vertically: left_paddle_y = right_paddle_y =
+    //     (court_h - paddle_h) * 0.5f
+    //   - serve the ball from the court centre moving LEFT on the first serve:
+    //     ball_pos = centre of the court, ball_vel = {-ball_speed, ball_speed*0.3f}
+    //   - zero both scores
+    // Tip: a small local reset_ball(dir_x) helper keeps make_initial and step DRY.
+    (void)c;
+    return State{};  // placeholder
 }
 
 gmath::AABB left_paddle_box(const State& s, const Config& c) {
-    return gmath::AABB{{c.paddle_margin, s.left_paddle_y}, {c.paddle_w, c.paddle_h}};
+    // TODO(stage 26): return the left paddle's collider — top-left at
+    // {paddle_margin, left_paddle_y}, size {paddle_w, paddle_h}.
+    (void)s;
+    (void)c;
+    return gmath::AABB{};  // placeholder
 }
 
 gmath::AABB right_paddle_box(const State& s, const Config& c) {
-    return gmath::AABB{{c.court_w - c.paddle_margin - c.paddle_w, s.right_paddle_y},
-                       {c.paddle_w, c.paddle_h}};
+    // TODO(stage 26): like left_paddle_box, but the right paddle sits in from the
+    // RIGHT wall: x = court_w - paddle_margin - paddle_w.
+    (void)s;
+    (void)c;
+    return gmath::AABB{};  // placeholder
 }
 
 gmath::AABB ball_box(const State& s, const Config& c) {
-    return gmath::AABB{s.ball_pos, {c.ball_size, c.ball_size}};
+    // TODO(stage 26): return the ball's collider — top-left ball_pos, size
+    // {ball_size, ball_size}.
+    (void)s;
+    (void)c;
+    return gmath::AABB{};  // placeholder
 }
 
 Event step(State& s, const Config& c, float dt, float move_left, float move_right) {
-    Event event = Event::None;
-
-    // 1) Move paddles, clamped so they stay fully inside the court.
-    const float max_y = c.court_h - c.paddle_h;
-    s.left_paddle_y = gmath::clamp(s.left_paddle_y + move_left * c.paddle_speed * dt, 0.0f, max_y);
-    s.right_paddle_y =
-        gmath::clamp(s.right_paddle_y + move_right * c.paddle_speed * dt, 0.0f, max_y);
-
-    // 2) Move the ball.
-    s.ball_pos += s.ball_vel * dt;
-
-    // 3) Bounce off the top and bottom walls. We snap the ball back to the wall
-    //    and FORCE the vertical velocity sign (abs / -abs) rather than just
-    //    negating it, so a ball already moving the right way can't get "stuck".
-    if (s.ball_pos.y <= 0.0f) {
-        s.ball_pos.y = 0.0f;
-        s.ball_vel.y = std::abs(s.ball_vel.y);
-        event = Event::WallBounce;
-    } else if (s.ball_pos.y + c.ball_size >= c.court_h) {
-        s.ball_pos.y = c.court_h - c.ball_size;
-        s.ball_vel.y = -std::abs(s.ball_vel.y);
-        event = Event::WallBounce;
-    }
-
-    // 4) Bounce off the paddles. Reuse the engine's aabb_vs_aabb: the penetration
-    //    vector pushes the ball back out, and we flip horizontal velocity away
-    //    from the paddle it hit. (Adding vertical "english" is an exercise.)
-    const gmath::Hit left_hit = gmath::aabb_vs_aabb(ball_box(s, c), left_paddle_box(s, c));
-    if (left_hit.collided && s.ball_vel.x < 0.0f) {
-        s.ball_pos += left_hit.penetration;
-        s.ball_vel.x = std::abs(s.ball_vel.x);
-        event = Event::PaddleBounce;
-    }
-    const gmath::Hit right_hit = gmath::aabb_vs_aabb(ball_box(s, c), right_paddle_box(s, c));
-    if (right_hit.collided && s.ball_vel.x > 0.0f) {
-        s.ball_pos += right_hit.penetration;
-        s.ball_vel.x = -std::abs(s.ball_vel.x);
-        event = Event::PaddleBounce;
-    }
-
-    // 5) Scoring: a point is scored when the ball leaves the court sideways.
-    //    Scoring outranks any bounce this frame, so we return immediately.
-    if (s.ball_pos.x > c.court_w) {
-        s.left_score += 1;
-        reset_ball(s, c, +1.0f);
-        return Event::ScoreLeft;
-    }
-    if (s.ball_pos.x + c.ball_size < 0.0f) {
-        s.right_score += 1;
-        reset_ball(s, c, -1.0f);
-        return Event::ScoreRight;
-    }
-
-    return event;
+    // TODO(stage 26): advance the simulation by dt and return the most significant
+    // Event this step (the Scene uses it to decide which sound to play). In order:
+    //   1. Move each paddle by move_* * paddle_speed * dt, clamped with
+    //      gmath::clamp so it stays fully inside the court [0, court_h - paddle_h].
+    //   2. Move the ball: ball_pos += ball_vel * dt.
+    //   3. Bounce off the top/bottom walls: snap the ball flush to the wall and
+    //      FORCE the vertical velocity sign (+/- std::abs). Record Event::WallBounce.
+    //   4. Bounce off the paddles with gmath::aabb_vs_aabb(ball_box, *_paddle_box):
+    //      on a hit while moving toward that paddle, add the penetration to
+    //      ball_pos and flip ball_vel.x away. Record Event::PaddleBounce.
+    //   5. Score when the ball fully leaves sideways: the LEFT player scores when
+    //      it passes the RIGHT edge (Event::ScoreLeft), the RIGHT player on the
+    //      LEFT edge (Event::ScoreRight); bump the score and re-serve. Scoring
+    //      outranks any bounce this frame, so return immediately.
+    (void)s;
+    (void)c;
+    (void)dt;
+    (void)move_left;
+    (void)move_right;
+    return Event::None;  // placeholder
 }
 
 }  // namespace pong

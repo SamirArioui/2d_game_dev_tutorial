@@ -219,8 +219,12 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — Game-math function set
 
-In [`project/src/main.cpp`](project/src/main.cpp). A small toolbox of the math every 2D game leans
-on, written as free functions so each demonstrates a different passing style:
+**Your task.** [`project/src/main.cpp`](project/src/main.cpp) is a **starter**: the function
+signatures and the `main()` that exercises them are given, and you fill in the six function bodies
+marked `TODO`. It **exercises every concept from this stage**: value / reference / `const&`
+parameters, overloading, and (in the code comments + this README) the stack model. The functions
+are a small toolbox of the math every 2D game leans on, each demonstrating a different passing
+style:
 
 - `clamp` — **overloaded** for `int` and `float`, both **by value**.
 - `lerp(a, b, t)` — linear interpolation, by value.
@@ -230,8 +234,16 @@ on, written as free functions so each demonstrates a different passing style:
 - `reflect(float& vx, float& vy)` — bounce a velocity straight back, **in place via reference
   out-parameters**.
 
-It **exercises every concept from this stage**: value / reference / `const&` parameters, overloading,
-and (in the code comments + this README) the stack model. Sample output:
+Build the starter and run it (it compiles from the start; the stubbed functions just return
+placeholders, so the numbers are wrong until you implement each body):
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o gamemath
+./gamemath
+echo $?          # should print 0
+```
+
+What your finished program should print:
 
 ```
 == Game-math toolbox ==
@@ -257,6 +269,13 @@ These functions are the third link in the throughline (dice battle → **game-ma
 inventory → …). In [stage 04](../04-headers-and-multi-file/) you'll split this exact toolbox across
 a `.hpp`/`.cpp` pair; in [stage 15](../15-2d-vector-math-and-motion/) `lerp`/`distance`/`reflect`
 become the backbone of real motion.
+
+Stuck? A complete reference is in [`project/solution/src/main.cpp`](project/solution/src/main.cpp)
+— try it yourself first, then compare:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/solution/src/main.cpp -o gamemath
+```
 
 ---
 

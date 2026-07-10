@@ -134,13 +134,19 @@ lightweight handle that points at it" rule** you first met as dangling pointers 
 **Toolchain:** CMake ≥ 3.16 and a C++17 compiler. First configure git-clones **SFML 2.6.1 (with
 audio)** and Catch2.
 
+The mini-project in [`project/`](project/) ships as a **starter**: the SFML shell (input, render,
+audio, the game loop in [`src/main.cpp`](project/src/main.cpp)) is complete, but the pure game-rule
+bodies in [`src/pong.cpp`](project/src/pong.cpp) and the AABB test in
+[`src/aabb.cpp`](project/src/aabb.cpp) are left as `TODO`s, so out of the box `ctest` is **RED**.
+You implement them to make it green.
+
 ```bash
 cd project
 cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 cmake --build build
 
 # Verify the game RULES headless (this is what CI runs):
-ctest --test-dir build --output-on-failure
+ctest --test-dir build --output-on-failure    # RED until you implement pong.cpp + aabb.cpp
 
 # Play it (needs a display + audio):
 ./build/pong          # left = W/S, right = Up/Down
@@ -148,6 +154,15 @@ ctest --test-dir build --output-on-failure
 
 > Iterate on logic without compiling SFML at all:
 > `cmake --build build --target pong_tests && ctest --test-dir build`.
+
+The complete, all-green reference is in [`project/solution/`](project/solution/) — build it the
+same way to see every rule pass:
+
+```bash
+cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure
+```
 
 **On this course's headless build machine**, the `pong` app is verified to **compile and link**
 against SFML graphics/window/system/**audio**; the window and sound are *unverified-by-execution*.
@@ -183,12 +198,27 @@ cmake --build build
 
 ## Mini-project — full Pong
 
-In [`project/`](project/). It **combines every concept of the stage**: two paddles driven by
+**Your task.** In [`project/`](project/). The SFML shell is done for you — real-time keyboard input,
+the rectangle/scoreboard rendering, the synthesized beep (buffer declared before sound), and the
+game loop in [`src/main.cpp`](project/src/main.cpp) are all complete. What's left is the **rules**:
+the pure functions in [`src/pong.cpp`](project/src/pong.cpp) (`integrate`, `clamp_paddle`,
+`bounce_off_walls`, `ball_hits_paddle`, `bounce_off_paddle`, `check_scoring`, `serve`,
+`make_initial_state`) and the [`src/aabb.cpp`](project/src/aabb.cpp) overlap test are stubbed with
+`// TODO` placeholders, so the starter compiles and links but
+[`tests/test_pong.cpp`](project/tests/test_pong.cpp) and
+[`tests/test_collision.cpp`](project/tests/test_collision.cpp) start **RED**. Implement the bodies
+until `ctest` is green — then run `./build/pong` and play.
+
+The finished project **combines every concept of the stage**: two paddles driven by
 real-time input, a ball that integrates motion, wall and paddle bounces via the tested AABB
 collision, spin on paddle hits, scoring with an auto re-serve, an `sf::Text` scoreboard, and a
 `sf::Sound` beep on every bounce (buffer declared before sound). The rules are the pure `pong_core`
 library; `main.cpp` is a thin shell. The tests in `tests/` pin the behavior so you can refactor the
 game fearlessly.
+
+Stuck? The complete reference is in [`project/solution/`](project/solution/) — build it with
+`cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++` and
+compare, but try it yourself first.
 
 This same Pong is the base for **stage 19**, where you'll bolt on a Dear ImGui debug overlay (a
 live FPS readout and a ball-speed slider), and it returns again in stage 23 when we re-express its

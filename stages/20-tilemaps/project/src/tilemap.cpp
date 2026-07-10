@@ -1,5 +1,23 @@
 // ============================================================================
-// Tilemap implementation — pure parsing + queries, no SFML.
+// Tilemap implementation — pure parsing + queries, no SFML.   — YOUR TASK
+// ============================================================================
+//
+// This is the STARTER. Implement the four methods below so the parser tests in
+// tests/test_tilemap.cpp go from RED to GREEN and the demo (src/main.cpp) can
+// load and walk a level. The full contract — the on-disk text format, the
+// tile-id convention, and what each method must do (including the edge cases
+// the tests check) — is documented in include/game/tilemap.hpp; read it first.
+//
+// The starter already COMPILES and LINKS (each body has a placeholder return),
+// but the tests fail until you fill in the TODOs. Everything else in this stage
+// (the SFML renderer, the window, the header) is complete — the *lesson* is the
+// pure, testable map logic, so that is what you write.
+//
+// A complete reference is in ../solution/src/tilemap.cpp — try it yourself first.
+//
+// Build & test (from this stage's project/ folder):
+//   cmake -S . -B build && cmake --build build
+//   ctest --test-dir build --output-on-failure   # RED until you implement these
 // ============================================================================
 
 #include "game/tilemap.hpp"
@@ -12,76 +30,40 @@
 namespace game {
 
 Tilemap Tilemap::from_text(const std::string& text) {
-    std::istringstream in(text);
-
-    Tilemap map;
-
-    // --- header line: three ints "W H tileSize" -----------------------------
-    // Reading into ints with `>>` fails (sets the stream's failbit) if a token
-    // is missing or isn't a number, so one `if (!(in >> ...))` catches "header
-    // absent" and "header not numeric" together.
-    if (!(in >> map.width_ >> map.height_ >> map.tile_size_)) {
-        throw std::runtime_error("tilemap: missing or non-numeric header (want 'W H tileSize')");
-    }
-    if (map.width_ <= 0 || map.height_ <= 0 || map.tile_size_ <= 0) {
-        throw std::runtime_error("tilemap: width, height and tileSize must all be positive");
-    }
-
-    // --- body: exactly width*height tile ids --------------------------------
-    // `>>` skips whitespace (including newlines) automatically, so we don't
-    // care how the rows are wrapped — we just need the right COUNT of ints.
-    const std::size_t expected = static_cast<std::size_t>(map.width_) *
-                                 static_cast<std::size_t>(map.height_);
-    map.tiles_.reserve(expected);
-
-    int value = 0;
-    while (in >> value) {
-        map.tiles_.push_back(value);
-    }
-
-    // Too few tiles (file truncated) OR too many (junk trailing data) is an
-    // error — a malformed map should fail loudly, not silently half-load.
-    if (map.tiles_.size() != expected) {
-        throw std::runtime_error("tilemap: expected " + std::to_string(expected) +
-                                 " tile ids but read " + std::to_string(map.tiles_.size()));
-    }
-
-    return map;
+    // TODO(stage 20): parse the on-disk text format into a Tilemap.
+    //  1. Feed `text` to a std::istringstream.
+    //  2. Read the header "W H tileSize" into width_/height_/tile_size_ with
+    //     `>>`; throw std::runtime_error if the read fails (missing/non-numeric)
+    //     or any of the three values is <= 0.
+    //  3. Read tile ids with `>>` (it skips whitespace/newlines) into `tiles_`,
+    //     then throw if the count isn't exactly width_ * height_ (too few OR too
+    //     many). Return the filled map.
+    return {};  // placeholder
 }
 
 Tilemap Tilemap::from_file(const std::string& path) {
-    // RAII: the ifstream opens here and closes itself when it goes out of scope
-    // (stage 10). No manual close, even on the throw path below.
-    std::ifstream file(path);
-    if (!file) {
-        throw std::runtime_error("tilemap: cannot open file '" + path + "'");
-    }
-
-    // Slurp the whole file into a string, then reuse the tested text parser.
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return from_text(buffer.str());
+    // TODO(stage 20): open `path` with std::ifstream (RAII — no manual close);
+    // throw std::runtime_error if it can't be opened. Slurp the whole file into
+    // a string (e.g. via a std::stringstream and file.rdbuf()) and hand it to
+    // from_text so the parse logic stays in one tested place.
+    return {};  // placeholder
 }
 
 int Tilemap::tile_at(int x, int y) const {
-    if (x < 0 || y < 0 || x >= width_ || y >= height_) {
-        return 0;  // off the map reads as empty
-    }
-    return tiles_[static_cast<std::size_t>(y) * static_cast<std::size_t>(width_) +
-                  static_cast<std::size_t>(x)];
+    // TODO(stage 20): return the tile id at cell (x, y). Out-of-range cells
+    // (x/y < 0 or >= width_/height_) must return 0 (empty) rather than throw, so
+    // collision code can query neighbours near the border. Index the flat buffer
+    // row-major: tiles_[y * width_ + x].
+    return 0;  // placeholder
 }
 
 bool Tilemap::solid_at(gmath::Vec2f world) const {
-    // Guard against a zero tile size (an unloaded map) so we never divide by 0.
-    if (tile_size_ <= 0) {
-        return false;
-    }
-    // std::floor (not a plain int cast) so that e.g. world.x == -0.5 maps to
-    // tile column -1, not 0. Truncation-toward-zero would be wrong for the
-    // half-open cells left of the origin.
-    const int tx = static_cast<int>(std::floor(world.x / static_cast<float>(tile_size_)));
-    const int ty = static_cast<int>(std::floor(world.y / static_cast<float>(tile_size_)));
-    return is_solid_id(tile_at(tx, ty));
+    // TODO(stage 20): convert the WORLD-space point to a grid cell and return
+    // whether that tile is solid. Guard tile_size_ <= 0 (unloaded map) -> false.
+    // Use std::floor when dividing by tile_size_ so negative coords map to
+    // negative cells (a plain int cast would wrongly truncate -0.5 to 0). Then
+    // return is_solid_id(tile_at(tx, ty)).
+    return false;  // placeholder
 }
 
 }  // namespace game

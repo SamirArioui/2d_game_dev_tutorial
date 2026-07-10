@@ -209,7 +209,7 @@ cd project
 # --- Fast path: tests only (no SFML, no display) ---
 cmake -S . -B build -DBUILD_APP=OFF
 cmake --build build
-ctest --test-dir build --output-on-failure        # 12 tests, all green
+ctest --test-dir build --output-on-failure        # 12 tests — RED until you implement the TODOs
 
 # --- Full path: also build the SFML demo ---
 cmake -S . -B build
@@ -252,27 +252,47 @@ Input mapping and the event system each get their own drill, as promised.
 
 ---
 
-## Mini-project — Menu / Playing / GameOver on a scene stack
+## Your task — Menu / Playing / GameOver on a scene stack
 
-In [`project/`](project/) ([`src/main.cpp`](project/src/main.cpp)). It **combines all four
-concepts**:
+**Your task.** [`project/`](project/) is a **starter**: the `Scene` interface, the concrete scenes
+and window boilerplate in [`src/main.cpp`](project/src/main.cpp), and the tests are all given, but
+the four subsystems' bodies are stubbed with `TODO`s. Implement them so the four tests go green:
 
-- **Scenes:** `MenuScene`, `PlayingScene`, `GameOverScene`, each a `scene::Scene` subclass.
-- **State machine + stack:** each scene *requests* a `GameState` transition; the main loop asks the
-  `StateMachine` whether it's legal and, if so, rebuilds the stack for the new state — safely,
-  outside the scene's own methods.
-- **Input mapping:** keys are bound to actions once in `main`; every scene reads *actions*
-  (`Confirm`, `MoveUp`, `Cancel`), never raw keys.
-- **Event bus:** scoring and game-over `emit` events; subscribers set up in `main` react (logged to
-  stderr) without the scenes knowing who listens.
+- **State machine** — `is_legal` / `transition_to` in
+  [`src/game_state.cpp`](project/src/game_state.cpp).
+- **Input map** — `bind` / `action_for` / … in [`include/input/action.hpp`](project/include/input/action.hpp).
+- **Event bus** — `subscribe` / `emit` / `subscriber_count` in
+  [`include/events/event_bus.hpp`](project/include/events/event_bus.hpp).
+- **Scene stack** — `push` / `pop` / `top` / `update` / … in
+  [`src/scene_stack.cpp`](project/src/scene_stack.cpp).
+
+The starter compiles and links, but `ctest` is **RED** until you fill in the `TODO`s — work through
+the four `tests/test_*.cpp` files until green. When done it **combines all four concepts**: the
+`MenuScene` / `PlayingScene` / `GameOverScene` each *request* a `GameState` transition; the main
+loop asks the `StateMachine` whether it's legal and, if so, rebuilds the stack — safely, outside the
+scene's own methods. Scenes read semantic *actions* (`Confirm`, `MoveUp`, `Cancel`), never raw keys,
+and `emit` scoring / game-over events that subscribers in `main` react to without the scenes knowing
+who listens.
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
+(it has its own `CMakeLists.txt`) and compare:
+
+```bash
+cmake -S project/solution -B project/solution/build -DBUILD_APP=OFF
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # all green
+```
 
 Text is drawn only if a system font loads (skipped gracefully otherwise), so the app builds and
-links anywhere. Build + link is verified; on-screen behaviour is unverified-by-execution.
+links anywhere. Build + link of your version is verified; on-screen behaviour is
+unverified-by-execution.
 
 ---
 
 ## Checklist before moving on
 
+- [ ] I implemented the mini-project starter (state machine, input map, event bus, scene stack) so
+      the four `tests/` suites are green.
 - [ ] I can explain why games use a scene *stack* rather than a single current-scene variable.
 - [ ] I know why the `Scene` base needs a `virtual` destructor, and why it forward-declares `sf`
       types instead of including SFML.

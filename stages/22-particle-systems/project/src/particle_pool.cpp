@@ -1,5 +1,25 @@
 // ============================================================================
-// particle_pool implementation — pooling, motion integration, emitters. No SFML.
+// particle_pool implementation — pooling, motion integration, emitters. No SFML.  — YOUR TASK
+// ============================================================================
+//
+// This is the STARTER. Implement the pooling rules and the two emitters below
+// so the pool tests in tests/test_pool.cpp go from RED to GREEN and the demo
+// (src/main.cpp) can burst + trail particles. Each function's contract — the
+// invariants the tests pin down — is documented in
+// include/game/particle_pool.hpp; read it first.
+//
+// The buffer allocation (the constructor) is done for you. The starter already
+// COMPILES and LINKS (each body has a placeholder return), but the tests fail
+// until you fill in the TODOs. Everything else in this stage (the SFML
+// vertex-array renderer with its life-based alpha FADE, the demo, the headers)
+// is complete — the *lesson* is the pure, testable pool logic, so that is what
+// you write.
+//
+// A complete reference is in ../solution/src/particle_pool.cpp — try it first.
+//
+// Build & test (from this stage's project/ folder):
+//   cmake -S . -B build && cmake --build build
+//   ctest --test-dir build --output-on-failure   # RED until you implement these
 // ============================================================================
 
 #include "game/particle_pool.hpp"
@@ -10,108 +30,47 @@ namespace game {
 
 ParticlePool::ParticlePool(std::size_t capacity) {
     // Allocate the entire buffer ONCE. This is the only allocation the pool
-    // ever does; from here on we recycle these slots forever.
+    // ever does; from here on we recycle these slots forever. (Done for you.)
     particles_.resize(capacity);
 }
 
 bool ParticlePool::spawn(const Particle& proto) {
-    if (alive_ >= particles_.size()) {
-        return false;  // full — refuse rather than grow
-    }
-    // Find a dead slot to recycle. A linear scan is fine for the small pools we
-    // use and keeps the idea obvious; a production system would keep a free-list
-    // of dead indices to make this O(1).
-    for (Particle& p : particles_) {
-        if (!p.alive) {
-            p = proto;       // copy the prototype's fields into the slot
-            p.alive = true;  // spawn always revives, whatever proto said
-            ++alive_;
-            return true;
-        }
-    }
-    return false;  // unreachable while alive_ is correct, but safe
+    // TODO(stage 22): revive one DEAD slot with `proto` and return true. If the
+    // pool is full (alive_ >= capacity) do nothing and return false — capacity
+    // is fixed, never grow. Find a slot where !alive, copy proto into it, force
+    // its `alive` flag true (whatever proto said), and increment alive_.
+    return false;  // placeholder
 }
 
 void ParticlePool::update(float dt) {
-    for (Particle& p : particles_) {
-        if (!p.alive) {
-            continue;
-        }
-        // Motion integration (stage 15): move by velocity * dt.
-        p.position += p.velocity * dt;
-        // Age it.
-        p.life -= dt;
-        if (p.life <= 0.0f) {
-            p.alive = false;  // recycle: this slot is now free to reuse
-            --alive_;
-        }
-    }
+    // TODO(stage 22): advance every ALIVE particle by dt: integrate its motion
+    // (position += velocity * dt, stage-15 style), age it (life -= dt), and when
+    // life runs out (<= 0) recycle the slot — mark it dead and decrement alive_
+    // so a later spawn can reuse it. (Skip slots that are already dead.)
+    (void)dt;
 }
 
 std::size_t emit_burst(ParticlePool& pool, gmath::Vec2f origin, std::size_t count,
                        std::mt19937& rng) {
-    std::uniform_real_distribution<float> angle(0.0f, 6.2831853f);  // 0..2*pi
-    std::uniform_real_distribution<float> speed(40.0f, 160.0f);
-    std::uniform_real_distribution<float> life(0.4f, 1.0f);
-    std::uniform_int_distribution<int> green(120, 200);  // orange..yellow
-
-    std::size_t spawned = 0;
-    for (std::size_t i = 0; i < count; ++i) {
-        const float a = angle(rng);
-        const float s = speed(rng);
-
-        Particle p;
-        p.position = origin;
-        p.velocity = gmath::Vec2f{std::cos(a) * s, std::sin(a) * s};
-        p.max_life = life(rng);
-        p.life = p.max_life;
-        p.r = 255;
-        p.g = static_cast<std::uint8_t>(green(rng));
-        p.b = 40;
-
-        if (!pool.spawn(p)) {
-            break;  // pool full — stop early
-        }
-        ++spawned;
-    }
-    return spawned;
+    // TODO(stage 22): spawn up to `count` particles flung out from `origin` in
+    // ALL directions (random angle 0..2*pi via a uniform_real_distribution,
+    // random speed, random lifetime) with warm colours. Set each Particle's
+    // position=origin, velocity={cos(a)*s, sin(a)*s}, life=max_life. Call
+    // pool.spawn(p) for each; STOP early when it returns false (pool full).
+    // Return how many actually spawned.
+    return 0;  // placeholder
 }
 
 std::size_t emit_trail(ParticlePool& pool, gmath::Vec2f origin, gmath::Vec2f ship_velocity,
                        std::size_t count, std::mt19937& rng) {
-    // Exhaust streams OPPOSITE the direction of travel. If the ship is still,
-    // fall back to "downward" so a parked ship still puffs.
-    gmath::Vec2f back = gmath::Vec2f{-ship_velocity.x, -ship_velocity.y};
-    if (gmath::length(back) < 0.001f) {
-        back = gmath::Vec2f{0.0f, 1.0f};
-    }
-    back = gmath::normalize(back);
-
-    std::uniform_real_distribution<float> exhaust_speed(60.0f, 120.0f);
-    std::uniform_real_distribution<float> jitter(-25.0f, 25.0f);
-    std::uniform_real_distribution<float> life(0.2f, 0.5f);
-    std::uniform_int_distribution<int> blue(200, 255);
-
-    std::size_t spawned = 0;
-    for (std::size_t i = 0; i < count; ++i) {
-        const float s = exhaust_speed(rng);
-
-        Particle p;
-        p.position = origin;
-        // Mostly backward, plus a small perpendicular-ish jitter for spread.
-        p.velocity = gmath::Vec2f{back.x * s + jitter(rng), back.y * s + jitter(rng)};
-        p.max_life = life(rng);
-        p.life = p.max_life;
-        p.r = 60;
-        p.g = 140;
-        p.b = static_cast<std::uint8_t>(blue(rng));
-
-        if (!pool.spawn(p)) {
-            break;
-        }
-        ++spawned;
-    }
-    return spawned;
+    // TODO(stage 22): spawn up to `count` exhaust particles at `origin` moving
+    // roughly OPPOSITE `ship_velocity` (normalize the negated velocity; fall
+    // back to {0,1} if the ship is still), plus a little random jitter, with
+    // cool colours and short lifetimes. Use gmath::length / gmath::normalize for
+    // the direction. Call pool.spawn(p) each time; stop when it returns false.
+    // Return how many actually spawned. (The tests check dot(velocity, ship_vel)
+    // < 0 — i.e. the exhaust really does point backward.)
+    return 0;  // placeholder
 }
 
 }  // namespace game

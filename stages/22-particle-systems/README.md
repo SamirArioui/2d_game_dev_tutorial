@@ -135,16 +135,23 @@ by fast tests; the *rendering* is left to build-and-eyeball.
 ## 6. Building and running
 
 The mini-project lives in [`project/`](project/) with three CMake targets: the pure `particle_core`
-library, the SFML `particle_demo`, and the Catch2 `particle_tests`.
+library, the SFML `particle_demo`, and the Catch2 `particle_tests`. It ships as a **starter**: the
+SFML vertex-array renderer (with its life-based alpha fade), the demo, and the headers are complete,
+but the pooling logic in [`project/src/particle_pool.cpp`](project/src/particle_pool.cpp) is left for
+you to write, so out of the box the pool tests are **RED**. You make them green.
 
 ```bash
 cd project
 cmake -S . -B build          # first run clones SFML 2.6.1 + Catch2 v3.7.1 (needs network)
 cmake --build build
 
-ctest --test-dir build --output-on-failure   # the pool tests -> 100% passed
+ctest --test-dir build --output-on-failure   # RED until you implement src/particle_pool.cpp
 ./build/particle_demo        # WASD to fly (leaves a trail); left-click to explode
 ```
+
+The complete, all-green reference is in [`project/solution/`](project/solution/) — build it the same
+way (`cmake -S project/solution -B project/solution/build && cmake --build project/solution/build`)
+to see `100% tests passed`.
 
 > **Sandbox / offline note:** the first `cmake` clones SFML and Catch2 from `github.com`; run it
 > with the sandbox disabled if your network is restricted. Later builds are offline (cached in
@@ -182,9 +189,9 @@ Each program asserts its own results and prints `all checks passed`.
 
 ---
 
-## Mini-project — explosion burst + thruster trail
+## Your task — explosion burst + thruster trail
 
-In [`project/`](project/). It **combines every concept of the stage**:
+In [`project/`](project/). The mini-project **combines every concept of the stage**:
 
 - ONE fixed-capacity `ParticlePool` feeding **both** effects (spawns dropped when full);
 - an **`emit_burst`** explosion on left-click and an **`emit_trail`** exhaust behind a WASD-driven
@@ -194,16 +201,30 @@ In [`project/`](project/). It **combines every concept of the stage**:
 - one-draw-call rendering via `sf::VertexArray`;
 - a Catch2 suite proving the pool's invariants, run by `ctest`.
 
-The window is *unverified-by-execution* (no display on the build machine) — the bar is that it
-**builds and links**; the pool *logic* is proven by the tests.
+**What you implement.** Everything above is wired up *except* the pooling logic — in
+[`project/src/particle_pool.cpp`](project/src/particle_pool.cpp) the `ParticlePool::spawn` (cap +
+recycle) and `ParticlePool::update` (integrate + age + recycle) methods and the two emitters
+(`emit_burst`, `emit_trail`) ship as `// TODO(stage 22)` stubs with placeholder returns (the
+constructor that allocates the buffer is done for you). The starter compiles and links, but the
+tests in [`project/tests/test_pool.cpp`](project/tests/test_pool.cpp) are **RED** until you fill them
+in. The invariants each function must uphold are documented in
+[`project/include/game/particle_pool.hpp`](project/include/game/particle_pool.hpp). Implement them,
+run `ctest`, and drive it to green — the SFML renderer (including the `life/max_life` alpha fade) and
+demo are already done for you (that half is *unverified-by-execution* on the build machine anyway;
+the bar is that it **builds and links**, while the pool *logic* you write is proven by the tests).
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
+(`cmake -S project/solution -B project/solution/build`) to compare.
 
 ---
 
 ## Checklist before moving on
 
+- [ ] I implemented `spawn`/`update` and both emitters, and drove the pool tests from RED to green.
 - [ ] I can explain why pooling beats allocating a particle per spawn (allocator/GC pressure, cache).
 - [ ] My pool allocates once, caps `spawn` at capacity, and recycles dead slots on `update`.
-- [ ] I integrated per-particle motion and faded alpha by `life / max_life`.
+- [ ] I integrated per-particle motion in `update`, and know the renderer fades alpha by
+      `life / max_life`.
 - [ ] I wrote an emitter that spawns a shape of particles and respects the capacity.
 - [ ] I used `<random>` for jitter and `gmath` (`normalize`/`dot`) for direction.
 - [ ] I ran the pool tests with `ctest` and understand which parts are testable and why.

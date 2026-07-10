@@ -177,11 +177,14 @@ Try each yourself before peeking at the solution.
 
 ---
 
-## Mini-project — `gmath::Vec2<T>` and `gmath::clamp<T>`
+## Your task — `gmath::Vec2<T>` and `gmath::clamp<T>`
 
-In [`project/include/vec2.hpp`](project/include/vec2.hpp) and
-[`project/src/main.cpp`](project/src/main.cpp). This is the **canonical `gmath` math library**
-the graphics and physics stages build on, so its shape is fixed:
+[`project/include/vec2.hpp`](project/include/vec2.hpp) is a **starter**: the declarations are
+given (the `Vec2<T>` struct with `T x, y;`, every operator/method **signature**, the `Vec2f`
+alias, and the `clamp<T>` signature) but the bodies are stubbed with `TODO`s — implementing them
+is your task. The driver [`project/src/main.cpp`](project/src/main.cpp) is complete and you do not
+edit it; it exercises what you implement. This is the **canonical `gmath` math library** the
+graphics and physics stages build on, so its shape is fixed:
 
 - **`gmath::Vec2<T>`** — a class template with members `T x, y;`, the operators `operator+`,
   `operator-`, `operator*` (by scalar), and `operator==`, plus the alias `using Vec2f =
@@ -193,12 +196,15 @@ The library is kept deliberately minimal — **stage 15 adds `dot`/`length`/`nor
 bridges it to `sf::Vector2f`, and **stage 13 unit-tests it**. `main.cpp` exercises `Vec2f`
 arithmetic and calls the one `clamp` template on `int`, `float`, and `double`.
 
+Build & run your version (it compiles from the start; the numbers are wrong until you implement
+`vec2.hpp`):
+
 ```bash
 cmake -S . -B build && cmake --build build
 ./build/vec2_demo
 ```
 
-Expected output:
+Expected output once implemented:
 
 ```
 player   = (1, 2)
@@ -214,6 +220,14 @@ clamp(0.42, 0.0, 1.0)   = 0.42
 (`next = player + velocity * dt` with `dt = 2`, and `back = next - velocity * dt` returns exactly
 to `player`, so `==` is `yes`. The same `clamp` template serves all three numeric types.)
 
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — it is self-contained
+with its own `CMakeLists.txt`. Try it yourself first, then compare:
+
+```bash
+cmake -S project/solution -B build-solution && cmake --build build-solution
+./build-solution/vec2_demo
+```
+
 ---
 
 ## Checklist before moving on
@@ -225,8 +239,9 @@ to `player`, so `==` is `yes`. The same `clamp` template serves all three numeri
 - [ ] I know why templates live in headers.
 - [ ] I can put code in a `namespace` and access it three ways (qualified, `using` declaration,
       `using namespace`), and I know why the last one doesn't belong in a header.
-- [ ] My `gmath::Vec2<T>` matches the course contract (the four operators + `Vec2f` alias) and I
-      did **not** add extra vector operations — those come in stage 15.
+- [ ] I implemented the mini-project starter (`project/include/vec2.hpp`) so my `gmath::Vec2<T>`
+      matches the course contract (the four operators + `Vec2f` alias) and I did **not** add extra
+      vector operations — those come in stage 15.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — cppreference on operator overloading,
 templates, and namespaces; "Back to Basics: Templates" on CppCon. Paste `Vec2<T>` into godbolt.org

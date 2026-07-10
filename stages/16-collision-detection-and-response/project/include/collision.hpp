@@ -1,7 +1,14 @@
 #pragma once
 
 // ===========================================================================
-// collide — pure 2D collision detection & response, built on gmath::Vec2f.
+// collide — pure 2D collision detection & response, built on gmath::Vec2f.  (YOUR TASK)
+//
+// This is the STARTER. The structs (AABB / Circle / Hit), the aabb_center helper,
+// and the gmath dependency are given. YOUR job is to implement the four functions
+// marked `// TODO(stage 16): ...` — aabb_vs_aabb, circle_vs_circle, circle_vs_aabb,
+// and reflect_velocity. Each ships as a placeholder return so the project compiles
+// and the window app links, but ../tests/test_collision.cpp starts RED until you
+// fill them in. A reference is in ../solution/include/collision.hpp — try it first.
 //
 // Detection answers "are these two shapes overlapping, and if so, by how much
 // and in which direction?" Response answers "how should their velocities change
@@ -54,29 +61,15 @@ inline gmath::Vec2f aabb_center(const AABB& b) {
 // axis of SMALLEST overlap (you back out the short way), so the penetration
 // vector lies on that axis, signed so it pushes A away from B.
 inline std::optional<Hit> aabb_vs_aabb(const AABB& a, const AABB& b) {
-    const float a_left = a.pos.x, a_right = a.pos.x + a.size.x;
-    const float a_top = a.pos.y, a_bottom = a.pos.y + a.size.y;
-    const float b_left = b.pos.x, b_right = b.pos.x + b.size.x;
-    const float b_top = b.pos.y, b_bottom = b.pos.y + b.size.y;
-
-    const float overlap_x = std::min(a_right, b_right) - std::max(a_left, b_left);
-    const float overlap_y = std::min(a_bottom, b_bottom) - std::max(a_top, b_top);
-
-    if (overlap_x <= 0.0f || overlap_y <= 0.0f) {
-        return std::nullopt;  // a gap on at least one axis -> no collision
-    }
-
-    const gmath::Vec2f ca = aabb_center(a);
-    const gmath::Vec2f cb = aabb_center(b);
-
-    if (overlap_x < overlap_y) {
-        // Separate horizontally: push A left if it sits left of B, else right.
-        const float sign = (ca.x < cb.x) ? -1.0f : 1.0f;
-        return Hit{gmath::Vec2f{sign * overlap_x, 0.0f}};
-    }
-    // Separate vertically.
-    const float sign = (ca.y < cb.y) ? -1.0f : 1.0f;
-    return Hit{gmath::Vec2f{0.0f, sign * overlap_y}};
+    // TODO(stage 16): compute the overlap on each axis:
+    //   overlap_x = min(a.right, b.right) - max(a.left, b.left);
+    //   overlap_y = min(a.bottom, b.bottom) - max(a.top, b.top);
+    // If either is <= 0 there's a gap -> return std::nullopt. Otherwise back out
+    // along the axis of SMALLER overlap, signed by comparing centers (aabb_center)
+    // so the penetration pushes A away from B. Return Hit{penetration}.
+    (void)a;
+    (void)b;
+    return std::nullopt;  // placeholder: never detects a hit yet
 }
 
 // --- Circle vs Circle ------------------------------------------------------
@@ -86,23 +79,14 @@ inline std::optional<Hit> aabb_vs_aabb(const AABB& a, const AABB& b) {
 // penetration points from B's center toward A's center (so it pushes A away),
 // with length = (r_a + r_b) - distance.
 inline std::optional<Hit> circle_vs_circle(const Circle& a, const Circle& b) {
-    const gmath::Vec2f delta = a.center - b.center;  // from B toward A
-    const float r = a.radius + b.radius;
-    const float dist_sq = gmath::length_squared(delta);
-
-    if (dist_sq >= r * r) {
-        return std::nullopt;
-    }
-
-    const float dist = gmath::length(delta);
-    const float depth = r - dist;
-
-    if (dist > 1e-8f) {
-        const gmath::Vec2f normal = delta * (1.0f / dist);  // unit, B -> A
-        return Hit{normal * depth};
-    }
-    // Exactly concentric: no defined direction, so pick +x arbitrarily.
-    return Hit{gmath::Vec2f{depth, 0.0f}};
+    // TODO(stage 16): delta = a.center - b.center (from B toward A). The circles
+    // miss iff length_squared(delta) >= (a.radius + b.radius)² — early-out with
+    // no sqrt. Otherwise depth = (rA + rB) - length(delta), and the penetration
+    // is the unit delta * depth (push A away from B). Guard the concentric case
+    // (dist ~0): pick an arbitrary axis, e.g. {depth, 0}.
+    (void)a;
+    (void)b;
+    return std::nullopt;  // placeholder: never detects a hit yet
 }
 
 // --- Circle vs AABB --------------------------------------------------------
@@ -113,39 +97,17 @@ inline std::optional<Hit> circle_vs_circle(const Circle& a, const Circle& b) {
 // the center. The tricky case is the center being INSIDE the box (closest point
 // == center, so there's no direction): we then eject through the nearest face.
 inline std::optional<Hit> circle_vs_aabb(const Circle& c, const AABB& box) {
-    const float left = box.pos.x, right = box.pos.x + box.size.x;
-    const float top = box.pos.y, bottom = box.pos.y + box.size.y;
-
-    const gmath::Vec2f closest{gmath::clamp(c.center.x, left, right),
-                               gmath::clamp(c.center.y, top, bottom)};
-    const gmath::Vec2f diff = c.center - closest;  // closest-point -> center
-    const float dist_sq = gmath::length_squared(diff);
-
-    if (dist_sq > c.radius * c.radius) {
-        return std::nullopt;
-    }
-
-    if (dist_sq > 1e-8f) {
-        // Center outside the box: push out along the surface normal.
-        const float dist = gmath::length(diff);
-        const gmath::Vec2f normal = diff * (1.0f / dist);
-        return Hit{normal * (c.radius - dist)};
-    }
-
-    // Center INSIDE the box: eject through whichever face is nearest.
-    const float d_left = c.center.x - left;
-    const float d_right = right - c.center.x;
-    const float d_top = c.center.y - top;
-    const float d_bottom = bottom - c.center.y;
-    const float min_x = std::min(d_left, d_right);
-    const float min_y = std::min(d_top, d_bottom);
-
-    if (min_x < min_y) {
-        return (d_left < d_right) ? Hit{gmath::Vec2f{-(d_left + c.radius), 0.0f}}
-                                  : Hit{gmath::Vec2f{d_right + c.radius, 0.0f}};
-    }
-    return (d_top < d_bottom) ? Hit{gmath::Vec2f{0.0f, -(d_top + c.radius)}}
-                              : Hit{gmath::Vec2f{0.0f, d_bottom + c.radius}};
+    // TODO(stage 16): find the closest point on the box to the circle's center by
+    // clamping the center to [left,right] x [top,bottom] (gmath::clamp per axis).
+    // diff = center - closest. Miss iff length_squared(diff) > radius². Otherwise:
+    //   * center OUTSIDE the box (dist > ~0): push out along the unit diff by
+    //     (radius - length(diff));
+    //   * center INSIDE the box (dist ~0, closest == center): eject through the
+    //     NEAREST face — compare distances to left/right/top/bottom and push out
+    //     that way by (face distance + radius).
+    (void)c;
+    (void)box;
+    return std::nullopt;  // placeholder: never detects a hit yet
 }
 
 // --- response: bounce with restitution -------------------------------------
@@ -161,11 +123,14 @@ inline std::optional<Hit> circle_vs_aabb(const Circle& c, const AABB& box) {
 // against the wall.
 inline gmath::Vec2f reflect_velocity(const gmath::Vec2f& v, const gmath::Vec2f& normal,
                                      float restitution) {
-    const float vn = gmath::dot(v, normal);
-    if (vn >= 0.0f) {
-        return v;  // moving away from (or along) the surface — nothing to do
-    }
-    return v - normal * ((1.0f + restitution) * vn);
+    // TODO(stage 16): reflect v off a surface with outward unit normal `normal`.
+    // Let vn = dot(v, normal). If vn >= 0 the object is moving away (or along) —
+    // return v unchanged so it can't stick. Otherwise return
+    //   v - normal * ((1 + restitution) * vn).
+    // restitution in [0,1]: 1 = perfect bounce, 0 = kill the normal component.
+    (void)normal;
+    (void)restitution;
+    return v;  // placeholder: no reflection yet
 }
 
 }  // namespace collide

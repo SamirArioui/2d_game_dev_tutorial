@@ -201,7 +201,10 @@ learn `FetchContent` on.
 
 ## Building and running
 
-The mini-project lives in [`project/`](project/):
+The mini-project lives in [`project/`](project/). Note the `CMakeLists.txt` there is a **starter
+you complete** (see "Your task" below), so these commands only produce an `app` once you've filled
+in its `TODO`s — the completed reference in `project/solution/` builds with the exact same commands
+today:
 
 ```bash
 cd project
@@ -247,7 +250,12 @@ Compare your `CMakeLists.txt` against the folder's `CMakeLists.solution.txt`. Or
 
 ## Mini-project — the console game as `game` lib + `app` exe
 
-In [`project/`](project/). It **combines everything from this stage**:
+**Your task.** In [`project/`](project/). The C++ sources are already complete — the *lesson* of
+this stage is the build system, so your job is the **`CMakeLists.txt`**. It ships as a guided
+starter full of `TODO(stage 12)` markers: as-is it configures but declares no targets, so nothing
+builds yet. Fill in each `TODO` to declare the **`game` library target**, the **`app` executable
+target**, link them (plus fetched `fmt`), and pull `fmt` via **`FetchContent`**. This
+**combines everything from this stage**:
 
 - All the logic from earlier stages — the math functions, `Inventory` (sort + `std::function`
   filter), and `Stats`/`SaveData` save/load — compiled into a single **`game` library target**
@@ -271,6 +279,19 @@ Half HP (lerp 0->30 @0.5) = 15.0
 Saved and reloaded 3 distinct item(s) from 'savegame.txt'.
 ```
 
+Build & run your version:
+
+```bash
+cd project
+cmake -S . -B build          # first run clones fmt into build/_deps (needs network)
+cmake --build build          # builds libgame.a, fmt, then the app
+./build/app                  # run it (Windows: .\build\Debug\app.exe)
+```
+
+Stuck? A complete, working `CMakeLists.txt` is in
+[`project/solution/CMakeLists.txt`](project/solution/CMakeLists.txt) — try it yourself first, then
+compare (it is self-contained: `cmake -S project/solution -B project/solution/build`).
+
 This `game` library is not throwaway: **stage 13 links this exact library from a Catch2 test
 runner** to unit-test the math, inventory, and save/load — which is the whole reason we put the
 logic in a library and kept `main` out of it.
@@ -288,7 +309,8 @@ logic in a library and kept `main` out of it.
 - [ ] I fetched `fmt` with `FetchContent` (pinned with `GIT_TAG`) and actually **called**
       `fmt::format`/`fmt::print`.
 - [ ] I can map `pip install` / `requirements.txt` onto `FetchContent_Declare` / `GIT_TAG`.
-- [ ] The mini-project builds as a `game` library + `app` executable and prints fmt-formatted output.
+- [ ] I completed the mini-project starter `CMakeLists.txt` (`project/`) so it builds as a `game`
+      library + `app` executable and prints fmt-formatted output.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — the "Modern CMake" guide, the
 `FetchContent` docs, and the fmt project.

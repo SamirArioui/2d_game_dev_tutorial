@@ -1,7 +1,14 @@
 #pragma once
 
 // ===========================================================================
-// motion — pure 2D motion & tweening, built on gmath::Vec2f.
+// motion — pure 2D motion & tweening, built on gmath::Vec2f.  (YOUR TASK)
+//
+// This is the STARTER. Every function below has a `// TODO(stage 15): ...` body
+// with a placeholder return, so the project compiles and the window app links —
+// but ../tests/test_motion.cpp starts RED. Implement each (the comments give the
+// formula) to drive the suite GREEN. NOTE: this builds on the vector functions
+// you implement in vec2.hpp, so finish those first (aim_velocity uses normalize).
+// A reference is in ../solution/include/motion.hpp — try it yourself first.
 //
 // Everything here is window-free and unit-tested (project/tests/). It covers the
 // two pillars of "things that move" in a 2D game:
@@ -35,16 +42,23 @@ struct Body {
 // velocity. It's the "obvious" order and what a naive implementation writes —
 // but under constant acceleration it slightly lags and gains energy over time.
 inline void integrate_explicit(Body& body, const gmath::Vec2f& accel, float dt) {
-    body.pos = body.pos + body.vel * dt;   // uses velocity from the START of the step
-    body.vel = body.vel + accel * dt;
+    // TODO(stage 15): explicit (forward) Euler — move with the OLD velocity
+    // FIRST, then update velocity:  pos += vel * dt;  vel += accel * dt;
+    (void)body;
+    (void)accel;
+    (void)dt;
 }
 
 // SEMI-IMPLICIT (symplectic) Euler updates velocity FIRST, then moves with the
 // NEW velocity. One line reordered — but it's far more stable for games and
 // conserves energy well, so it's the default for gravity/springs. Prefer this.
 inline void integrate_semi_implicit(Body& body, const gmath::Vec2f& accel, float dt) {
-    body.vel = body.vel + accel * dt;      // update velocity first ...
-    body.pos = body.pos + body.vel * dt;   // ... then move with the NEW velocity
+    // TODO(stage 15): semi-implicit (symplectic) Euler — update velocity FIRST,
+    // then move with the NEW velocity:  vel += accel * dt;  pos += vel * dt;
+    // (Just the two lines above, swapped. This is the one to prefer for gravity.)
+    (void)body;
+    (void)accel;
+    (void)dt;
 }
 
 // aim_velocity — the "shoot toward a target" helper the mini-project is built on.
@@ -53,7 +67,12 @@ inline void integrate_semi_implicit(Body& body, const gmath::Vec2f& accel, float
 // is why normalize matters: it separates DIRECTION from MAGNITUDE.
 inline gmath::Vec2f aim_velocity(const gmath::Vec2f& origin, const gmath::Vec2f& target,
                                  float speed) {
-    return gmath::normalize(target - origin) * speed;
+    // TODO(stage 15): return a velocity of magnitude `speed` aimed from origin
+    // toward target — normalize(target - origin) * speed. (Uses your normalize.)
+    (void)origin;
+    (void)target;
+    (void)speed;
+    return gmath::Vec2f{0.0f, 0.0f};  // placeholder
 }
 
 // --- easing (tweening curves) ----------------------------------------------
@@ -65,26 +84,33 @@ inline gmath::Vec2f aim_velocity(const gmath::Vec2f& origin, const gmath::Vec2f&
 
 // ease_in_quad — starts slow, speeds up (t squared).
 inline float ease_in_quad(float t) {
-    return t * t;
+    // TODO(stage 15): starts slow, speeds up — return t squared (t * t).
+    return t;  // placeholder: linear (not yet eased)
 }
 
 // ease_out_quad — starts fast, slows to a stop.
 inline float ease_out_quad(float t) {
-    return 1.0f - (1.0f - t) * (1.0f - t);
+    // TODO(stage 15): starts fast, slows to a stop —
+    // return 1 - (1 - t) * (1 - t).
+    return t;  // placeholder: linear (not yet eased)
 }
 
 // smoothstep — the classic S-curve: eases in AND out, flat slope at both ends.
 // smoothstep(t) = 3t² - 2t³. The go-to curve for "smooth but simple".
 inline float smoothstep(float t) {
-    return t * t * (3.0f - 2.0f * t);
+    // TODO(stage 15): the classic S-curve — return 3t² - 2t³, i.e.
+    // t * t * (3 - 2 * t). Eases in AND out with flat slopes at 0 and 1.
+    return t;  // placeholder: linear (not yet an S-curve)
 }
 
 // ping_pong — turn an ever-increasing time value into a 0→1→0→1… triangle wave
 // of period 2. Feed it (elapsed_seconds * rate) to drive a platform back and
 // forth forever: the output sweeps up to 1, back down to 0, and repeats.
 inline float ping_pong(float t) {
-    float cycle = t - 2.0f * std::floor(t / 2.0f);  // wrap t into [0, 2)
-    return cycle <= 1.0f ? cycle : 2.0f - cycle;    // fold [1,2) back down to [1,0]
+    // TODO(stage 15): fold an ever-increasing t into a 0->1->0 triangle wave of
+    // period 2. First wrap t into [0, 2): cycle = t - 2 * floor(t / 2). Then fold
+    // the top half back down: return cycle <= 1 ? cycle : 2 - cycle.
+    return t;  // placeholder: no wrapping/folding yet
 }
 
 }  // namespace motion

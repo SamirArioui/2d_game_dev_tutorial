@@ -111,10 +111,11 @@ The payoff is concrete: `main()` for Pong shrinks to *configure → push a scene
  │   └── src/                    the .cpp files that actually touch SFML
  ├── project/                    the mini-project: Pong on libengine
  │   ├── CMakeLists.txt          fetches SFML + Catch2, adds ../engine, builds pong + tests
- │   ├── src/pong_logic.{hpp,cpp}   PURE rules (unit-tested)
- │   ├── src/pong_scene.{hpp,cpp}   the Scene (draws + input + audio)
- │   ├── src/main.cpp               configure → push → run()  (tiny!)
- │   └── tests/                     Catch2 tests for the pure logic
+ │   ├── src/pong_logic.{hpp,cpp}   PURE rules (unit-tested)             ── YOU implement
+ │   ├── src/pong_scene.{hpp,cpp}   the Scene (draws + input + audio)   ── YOU implement
+ │   ├── src/main.cpp               configure → push → run()  (given, complete)
+ │   ├── tests/                     Catch2 tests for the pure logic (RED until you implement)
+ │   └── solution/                  complete REFERENCE (its own standalone build)
  └── exercises/                  SFML-free engine-API drills
 ```
 
@@ -169,8 +170,8 @@ The mini-project is the buildable unit (like stages 12–13, each subfolder buil
 ```bash
 cd stages/26-extract-the-engine/project
 cmake -S . -B build            # FIRST run clones SFML 2.6.1 + Catch2 v3.7.1 (needs network)
-cmake --build build
-ctest --test-dir build --output-on-failure   # runs the PURE-logic tests -> all green
+cmake --build build            # builds the given engine + your (stubbed) game
+ctest --test-dir build --output-on-failure   # PURE-logic tests — RED until you implement pong_logic.cpp
 ./build/pong                   # opens the game window (needs a display)
 ```
 
@@ -219,22 +220,38 @@ cmake --build build --target 01_vec2_math && ./build/01_vec2_math
 
 ---
 
-## Mini-project — Pong on `libengine`
+## Your task — port Pong onto `libengine`
 
-In [`project/`](project/). The same Pong from stage 18, restructured to *prove the engine is
-reusable*:
+In [`project/`](project/). The engine in [`engine/`](engine/) is **provided complete** — you write
+**no** engine code this stage. Your job is to build the GAME on top of it: the same Pong from stage
+18, restructured to *prove the engine is reusable*. The starter already compiles, links and runs
+(every game body is a placeholder), but the pong tests are **RED** until you implement:
 
-- **`pong_logic.{hpp,cpp}`** — the rules as pure data + free functions over `gmath` (ball motion,
-  wall/paddle bounces via `aabb_vs_aabb`, scoring). Zero SFML → unit-tested in `tests/`.
-- **`pong_scene.{hpp,cpp}`** — a `eng::Scene` that draws the state (procedural textures, no image
+- **`src/pong_logic.cpp`** — the rules as pure data + free functions over `gmath` (ball motion,
+  wall/paddle bounces via `aabb_vs_aabb`, scoring). Zero SFML → this is exactly what `tests/` drives
+  headless. The `Config`/`State`/`Event` types and the declarations are given in `pong_logic.hpp`;
+  you implement the bodies.
+- **`src/pong_scene.cpp`** — a `eng::Scene` that draws the state (procedural textures, no image
   files), maps input through `eng::InputMap`, and plays a synthesized beep (`eng::make_tone`) on
-  each bounce/score.
-- **`main.cpp`** — configure an `eng::AppConfig`, push a `PongScene`, call `run()`. That's it.
+  each bounce/score. The class definition is given in `pong_scene.hpp`; you implement the methods.
+- **`src/main.cpp`** — configure an `eng::AppConfig`, push a `PongScene`, call `run()`. **Given and
+  complete**; read it to see how small the entry point becomes.
 
 **Which engine subsystem does what, here:** `Application` = the loop; `Scene`/`SceneStack` =
 Pong-as-a-mode; `InputMap` = rebindable actions; `textures` = paddle/ball sprites; `audio` = the
 beep; `collision`+`math` = the physics inside the pure rules. (Tilemap, camera and particles ride
 along in the library unused — the stage-27 capstone exercises those.)
+
+Work the pure rules first — run `ctest` until the pong tests go green — then bring the scene to
+life. Stuck? A complete reference is in [`project/solution/`](project/solution/) (a self-contained,
+standalone build). Try it yourself first, then compare:
+
+```bash
+cmake -S project/solution -B project/solution/build
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # all green
+./project/solution/build/pong                                  # opens a window (needs a display)
+```
 
 The lesson lands when you notice `main.cpp` no longer contains a loop, a window, or a clock, and
 that this same `Application` is what stage 27 reuses.
@@ -246,7 +263,7 @@ that this same `Application` is what stage 27 reuses.
 - [ ] I can explain static vs dynamic linking and why the course engine is static.
 - [ ] I can state what **inversion of control** means and point to it in `Application::run()`.
 - [ ] I can name the pure/impure seam and why `scene.hpp` forward-declares SFML types.
-- [ ] I built the project, ran `ctest` (pure logic green), and understand why the tests need no window.
+- [ ] I implemented the pure Pong rules (`pong_logic.cpp`) and the Scene (`pong_scene.cpp`); `ctest` goes green and I understand why the tests need no window.
 - [ ] I can describe how Pong went from *owning main()* (stage 18) to *being a Scene* (here).
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — game-loop patterns (Gaffer on Games'

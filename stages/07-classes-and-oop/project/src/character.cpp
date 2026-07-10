@@ -1,25 +1,23 @@
+// YOUR TASK — implement the Character methods declared in character.hpp.
+// A complete reference is in ../solution/src/character.cpp.
 #include "character.hpp"
 
 #include <algorithm>   // std::max
 #include <iostream>
 #include <utility>     // std::move
 
+// The constructor is given as your worked example of a MEMBER-INITIALIZER LIST: the part after
+// the ':' constructs each member directly with its final value (cheaper than assigning in the
+// body, and the only option for const/reference members). `name` is a sink parameter, moved in.
 Character::Character(std::string name, int hp, int attack, int defense)
-    : name_(std::move(name)), hp_(hp), attack_(attack), defense_(defense) {
-    // The body is empty on purpose: all the real initialization happened in the member-init
-    // list above, which constructs each member exactly once with its final value.
-}
+    : name_(std::move(name)), hp_(hp), attack_(attack), defense_(defense) {}
 
 void Character::take_damage(int amount) {
-    // Never let hp drop below 0. Keeping this rule inside the class (rather than trusting every
-    // caller to remember it) is the whole point of encapsulation.
-    hp_ = std::max(0, hp_ - amount);
+    // TODO(stage 07): subtract `amount` from hp_, but never let hp_ drop below 0
+    // (std::max(0, hp_ - amount)). Keeping this invariant inside the class is encapsulation.
 }
 
 void Character::take_turn(Character& target) {
-    // Base behaviour: a basic attack. Damage is attack minus the target's defense, floored at
-    // 1 so a turn is never completely wasted.
-    int dmg = std::max(1, attack_ - target.defense());
-    std::cout << name_ << " attacks " << target.name() << " for " << dmg << " damage.\n";
-    target.take_damage(dmg);
+    // TODO(stage 07): basic attack — damage = std::max(1, attack_ - target.defense()); print
+    // "<name_> attacks <target name> for <dmg> damage.\n"; then target.take_damage(dmg).
 }

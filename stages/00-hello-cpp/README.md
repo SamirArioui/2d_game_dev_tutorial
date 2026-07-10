@@ -193,9 +193,10 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — Character-sheet printer
 
-In [`project/src/main.cpp`](project/src/main.cpp). It **combines everything from this stage**:
-`#include`, `main`, a multi-line formatted `std::cout` block mixing text and numeric literals,
-and a clean `return 0`. It prints a tabletop-style character sheet:
+**Your task.** [`project/src/main.cpp`](project/src/main.cpp) is a **starter** with `TODO`s — you
+implement it, **combining everything from this stage**: `#include`, `main`, a multi-line formatted
+`std::cout` block mixing text and numeric literals, and a clean `return 0`. Fill in each `TODO` so
+the program prints exactly this tabletop-style character sheet:
 
 ```
 ============================
@@ -215,7 +216,7 @@ The values are hardcoded literals for now — in **stage 01** you'll make them r
 variables, and in **stage 02** you'll compute derived stats with functions. This same character
 threads through the whole course.
 
-Build & run:
+Build & run your version:
 
 ```bash
 clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o character_sheet
@@ -223,11 +224,18 @@ clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o character_sheet
 echo $?          # should print 0
 ```
 
+Stuck? A complete reference is in [`project/solution/src/main.cpp`](project/solution/src/main.cpp)
+— try it yourself first, then compare:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/solution/src/main.cpp -o character_sheet
+```
+
 ---
 
 ## Checklist before moving on
 
-- [ ] I compiled and ran the mini-project and saw the character sheet.
+- [ ] I implemented the mini-project starter (`project/src/main.cpp`) and it prints the sheet.
 - [ ] I can explain, in one sentence, why C++ compiles and Python interprets.
 - [ ] I know the three pipeline stages (preprocess / compile / link).
 - [ ] I can read a `file:line:column` compiler error and fix the first one first.

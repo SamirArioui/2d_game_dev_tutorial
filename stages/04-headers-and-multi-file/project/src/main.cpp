@@ -1,15 +1,34 @@
-// main.cpp — the mini-project driver.
+// main.cpp — the mini-project driver.  (YOUR TASK)
 //
-// It ties together THREE headers over FOUR translation units:
-//   - mathutils.hpp / mathutils.cpp  (clamp / lerp / distance)
-//   - player.hpp    / player.cpp     (the shared Player type + print_player)
-//   - this file                      (main)
+// This is the STARTER. Implement it yourself using what the README taught: this file
+// #includes only the two HEADERS (declarations); you write the DEFINITIONS in
+// mathutils.cpp and player.cpp, and the LINKER stitches all four translation units
+// together. That is the whole point of the stage: compile each .cpp separately, then link.
 //
-// main.cpp only #includes the two HEADERS (declarations). The matching DEFINITIONS are
-// supplied by mathutils.cpp and player.cpp, and stitched in by the LINKER. That is the
-// whole point of the stage: compile each .cpp separately, then link the object files.
+// A complete reference is in ../solution/src/ — try it yourself first, then compare.
 //
-// Build (compile all translation units, then link them into one program):
+// GOAL — once you fill in main() here AND the bodies in mathutils.cpp / player.cpp, the
+// program should print exactly this:
+//
+//   === Stage 04 — multi-file math demo ===
+//
+//   Party:
+//     Aria the Bold (hp 8)
+//
+//   A +40 potion would clamp HP to 30 (max is 30, so the overheal is discarded).
+//
+//   Healing 8 -> 30 over 5 frames (lerp):
+//     frame 0: hp = 8
+//     frame 1: hp = 12.4
+//     frame 2: hp = 16.8
+//     frame 3: hp = 21.2
+//     frame 4: hp = 25.6
+//     frame 5: hp = 30
+//
+//   Distance to chest: 5
+//
+// Build (compile all translation units, then link them into one program). List every .cpp;
+// headers are NOT listed (they're #included):
 //   clang++ -std=c++17 -Wall -Wextra src/main.cpp src/mathutils.cpp src/player.cpp -o mathgame
 //   ./mathgame
 #include <iostream>
@@ -18,36 +37,18 @@
 #include "player.hpp"
 
 int main() {
-    std::cout << "=== Stage 04 — multi-file math demo ===\n\n";
+    // TODO(stage 04): print the banner line "=== Stage 04 — multi-file math demo ===\n\n".
 
-    // --- The shared Player type: constructed here in main, printed by player.cpp. ---
-    Player hero{"Aria the Bold", 8};   // wounded: 8 out of a possible 30 HP
-    const int max_hp = 30;
+    // TODO(stage 04): construct the shared Player `hero` ("Aria the Bold", hp 8) and a
+    // `const int max_hp = 30;`. Print "Party:\n", then call print_player(hero).
 
-    std::cout << "Party:\n";
-    print_player(hero);
+    // TODO(stage 04): clamp — a +40 potion heals, but HP can never exceed max_hp. Use
+    // clamp(hero.hp + potion, 0, max_hp) (cast to/from float) and report the clamped value.
 
-    // clamp: a big potion heals +40, but HP can never exceed max_hp (no overheal).
-    const int potion = 40;
-    const int healed = static_cast<int>(
-        clamp(static_cast<float>(hero.hp + potion), 0.0f, static_cast<float>(max_hp)));
-    std::cout << "\nA +" << potion << " potion would clamp HP to " << healed << " (max is "
-              << max_hp << ", so the overheal is discarded).\n";
+    // TODO(stage 04): lerp — ease a healing animation from hero.hp up to max_hp over 5
+    // frames. Loop frame = 0..5, t = frame / 5.0f, print lerp(hero.hp, max_hp, t) each frame.
 
-    // lerp: ease a healing animation from current HP up to full over 5 frames.
-    std::cout << "\nHealing " << hero.hp << " -> " << max_hp << " over 5 frames (lerp):\n";
-    for (int frame = 0; frame <= 5; ++frame) {
-        const float t = static_cast<float>(frame) / 5.0f;
-        const float hp = lerp(static_cast<float>(hero.hp), static_cast<float>(max_hp), t);
-        std::cout << "  frame " << frame << ": hp = " << hp << "\n";
-    }
+    // TODO(stage 04): distance — print distance((2,1), (5,5)) using the distance() function.
 
-    // distance: how far is the hero (2, 1) from a treasure chest at (5, 5)?
-    const float hero_x = 2.0f;
-    const float hero_y = 1.0f;
-    const float chest_x = 5.0f;
-    const float chest_y = 5.0f;
-    std::cout << "\nDistance to chest: " << distance(hero_x, hero_y, chest_x, chest_y) << "\n";
-
-    return 0;
+    return 0;  // success — leave this last
 }

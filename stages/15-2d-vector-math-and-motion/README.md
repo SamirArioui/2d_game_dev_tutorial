@@ -200,7 +200,16 @@ Try each yourself before peeking at the `.solution.cpp`.
 
 ## Mini-project — Aimed projectile + eased platform
 
-In [`project/`](project/). Two movers, one per half of the stage:
+**Your task.** In [`project/`](project/). The SFML scaffolding — the window, the event loop, mouse
+re-aiming and all the drawing through the `to_sfml()` bridge in
+[`src/main.cpp`](project/src/main.cpp) — is complete. What's missing is the **pure maths** the demo
+leans on: the vector free functions in [`include/vec2.hpp`](project/include/vec2.hpp) (`dot`,
+`length`, `normalize`, `distance`, vector `lerp`) and the motion helpers in
+[`include/motion.hpp`](project/include/motion.hpp) (the two Euler integrators, `aim_velocity`, the
+easing curves, `ping_pong`) ship as `// TODO(stage 15)` stubs. The app builds and links, but the
+projectile won't fly and the tests start **RED**. Implement each function (the header comments give
+the formula; do `vec2.hpp` first, since `aim_velocity` uses `normalize`) and drive the suite green.
+Two movers, one per half of the stage:
 
 - a **projectile** launched with `aim_velocity(origin, target, speed)` and
   falling under **gravity** via **semi-implicit Euler** — click to re-aim it;
@@ -213,6 +222,22 @@ covered by the Catch2 suite you can run headless here. The window itself is
 *unverified-by-execution* in this course's build box (no display) but compiles
 and links against SFML.
 
+```bash
+cd project
+cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build build
+ctest --test-dir build --output-on-failure    # RED until you implement vec2.hpp + motion.hpp
+```
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — try it yourself first,
+then compare. It's a self-contained project you build on its own:
+
+```bash
+cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # GREEN
+```
+
 > **Builds on stage 14:** the loop still clamps `dt` against hitches. **Feeds
 > stage 16:** the projectile currently flies off-screen and relaunches — giving
 > it something to *collide* with is the next stage.
@@ -221,8 +246,9 @@ and links against SFML.
 
 ## Checklist before moving on
 
-- [ ] I added `dot` / `length` / `normalize` / `distance` / `lerp` to `gmath` as
-      **free functions**, and `normalize` guards the zero vector.
+- [ ] I implemented the mini-project's `vec2.hpp` (`dot` / `length` / `normalize` / `distance` /
+      `lerp` as **free functions**, `normalize` guarding the zero vector) and `motion.hpp`, driving
+      `test_vec2.cpp` + `test_motion.cpp` from red to green.
 - [ ] I can integrate motion with **semi-implicit Euler** and explain why it beats
       explicit Euler for gravity.
 - [ ] I know gravity is a **positive-y** acceleration because +y is down.

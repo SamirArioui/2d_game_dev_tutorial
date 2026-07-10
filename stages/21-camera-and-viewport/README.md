@@ -129,20 +129,27 @@ world→screen. (We use shapes, not `sf::Text`, so the stage ships no binary fon
 ## 7. Building and running
 
 The mini-project lives in [`project/`](project/) with three CMake targets: `camera_core` (pure
-maths + the carried tilemap), the SFML `camera_demo`, and the Catch2 `camera_tests`.
+maths + the carried tilemap), the SFML `camera_demo`, and the Catch2 `camera_tests`. It ships as a
+**starter**: the SFML `sf::View` / parallax / HUD boilerplate and the headers are complete, but the
+pure camera maths in [`project/src/camera.cpp`](project/src/camera.cpp) is left for you to write, so
+out of the box the camera-maths tests are **RED**. You make them green.
 
 ```bash
 cd project
 cmake -S . -B build          # first run clones SFML 2.6.1 + Catch2 v3.7.1 (needs network)
 cmake --build build
 
-ctest --test-dir build --output-on-failure   # the camera-maths tests -> 100% passed
+ctest --test-dir build --output-on-failure   # RED until you implement src/camera.cpp
 ./build/camera_demo          # run from project/ so it finds assets/level2.map
 ```
 
 Move with **WASD** / arrows: the camera follows and clamps at the level edges, the starfield drifts
 slowly behind, the minimap dot tracks you, and **clicking** drops a world-space marker under the
 cursor (the click-to-world conversion in action).
+
+The complete, all-green reference is in [`project/solution/`](project/solution/) — build it the same
+way (`cmake -S project/solution -B project/solution/build && cmake --build project/solution/build`)
+to see `100% tests passed`.
 
 > **Sandbox / offline note:** the first `cmake` clones SFML and Catch2 from `github.com`; run it
 > with the sandbox disabled if your network is restricted. Later builds are offline (cached in
@@ -174,9 +181,9 @@ Each program asserts its own results and prints `all checks passed`.
 
 ---
 
-## Mini-project — scrolling camera + parallax + HUD
+## Your task — scrolling camera + parallax + HUD
 
-In [`project/`](project/). It **combines every concept of the stage**:
+In [`project/`](project/). The mini-project **combines every concept of the stage**:
 
 - an `sf::View` that **follows** the player and **clamps** to the 1280×640 level;
 - a **parallax** starfield that scrolls at 30% of the camera;
@@ -185,13 +192,26 @@ In [`project/`](project/). It **combines every concept of the stage**:
 - a self-contained **tilemap** copy (from stage 20) for the level and its collision;
 - a Catch2 suite for the pure camera maths, run by `ctest`.
 
-The window is *unverified-by-execution* (no display on the build machine) — the bar is that it
-**builds and links**; the camera *maths* is proven by the tests.
+**What you implement.** Everything above is wired up *except* the pure camera maths — the functions
+in [`project/src/camera.cpp`](project/src/camera.cpp) (`clamp`, `clamp_view_center`,
+`screen_to_world`, `world_to_screen`, `parallax_offset`) ship as `// TODO(stage 21)` stubs with
+placeholder returns. The starter compiles and links, but the tests in
+[`project/tests/test_camera.cpp`](project/tests/test_camera.cpp) are **RED** until you fill them in.
+The contract (formulas + edge cases) for each function is in
+[`project/include/game/camera.hpp`](project/include/game/camera.hpp). Implement them, run `ctest`,
+and drive it to green — the SFML `sf::View` / parallax / HUD layer is already done for you (that half
+is *unverified-by-execution* on the build machine anyway; the bar is that it **builds and links**,
+while the camera *maths* you write is proven by the tests).
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
+(`cmake -S project/solution -B project/solution/build`) to compare.
 
 ---
 
 ## Checklist before moving on
 
+- [ ] I implemented the pure camera maths (`clamp_view_center`, `screen_to_world`/`world_to_screen`,
+      `parallax_offset`) and drove the camera-maths tests from RED to green.
 - [ ] I can name the difference between world, screen, and view space.
 - [ ] I moved an `sf::View` to follow a target and switched views to draw a fixed HUD.
 - [ ] I clamped the view center so the camera never shows past the level edges.

@@ -276,13 +276,28 @@ its `NN_name.solution.cpp`; the CMake exercise is a small folder.
 
 ---
 
-## Mini-project — convert the stage-04 program to CMake, then debug & lint it
+## Your task — convert the stage-04 program to CMake, then debug & lint it
 
-In [`project/`](project/). Same sources as stage 04 (`mathutils.hpp/.cpp`, `player.hpp/.cpp`,
-`main.cpp`), now driven by a [`project/CMakeLists.txt`](project/CMakeLists.txt). It exercises
-**every** concept of this stage. Walk through all three tools:
+**You implement it.** [`project/`](project/) is a **starter**: the same sources as stage 04
+(`mathutils.hpp/.cpp`, `player.hpp/.cpp`, `main.cpp`), now driven by a
+[`project/CMakeLists.txt`](project/CMakeLists.txt) that is **given** for you. The two headers are
+given (the contract) and the `CMakeLists.txt` is given; your job is to fill in each
+`// TODO(stage 05)` in `main.cpp`, `mathutils.cpp`, and `player.cpp`. The starter already
+configures, builds, and links (the bodies are stubbed with placeholders) — so you can practise the
+CMake / `lldb` / `clang-format` / `clang-tidy` workflow immediately, then watch the output become
+correct as you replace each stub.
 
-**1. Build it with CMake** (see §5). Confirm you get `build/mathgame` and it runs.
+A complete reference is in [`project/solution/`](project/solution/) — a self-contained CMake
+build. Try it yourself first, then compare / build it standalone:
+
+```bash
+cmake -S project/solution -B build-sol && cmake --build build-sol && ./build-sol/mathgame
+```
+
+It exercises **every** concept of this stage. Walk through all three tools:
+
+**1. Build it with CMake** (see §5). Confirm you get `build/mathgame` and it runs. Until you fill
+in the `TODO`s the math prints placeholder zeros — implement the bodies to get the output in §5.
 
 **2. Debug it with `lldb`.** Reproduce the session from §3 on your own build:
 
@@ -326,6 +341,8 @@ informative. That's *why* you debug the Debug build.
 
 ## Checklist before moving on
 
+- [ ] I implemented the mini-project starter (`project/src/`), built it with CMake, and it prints
+      the expected output.
 - [ ] I can write a minimal `CMakeLists.txt` (`cmake_minimum_required`, `project`, `add_executable`).
 - [ ] I know CMake is two steps — **configure** (`-S . -B build`) then **build** (`--build build`) —
       and that I only re-configure when `CMakeLists.txt` changes.

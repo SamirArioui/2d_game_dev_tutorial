@@ -1,6 +1,10 @@
 // ============================================================================
 // Stage 27 capstone — a top-down explorer on libengine.
 //
+// This file is GIVEN and complete — no TODOs here. Your task lives in the game
+// logic (world.cpp, inventory.cpp, save_data.cpp) and the ExploreScene glue
+// (explore_scene.cpp); this main() just configures the app and pushes the scene.
+//
 // Same shape as the stage-26 Pong main(): configure the app, push ONE scene,
 // run(). The engine and its Application loop are IDENTICAL to stage 26 — this is
 // the proof the engine is genuinely reusable. All the new work went into the

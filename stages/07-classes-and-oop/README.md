@@ -240,11 +240,13 @@ Try each yourself before peeking at the solution.
 
 ---
 
-## Mini-project — a turn-based battle with a self-closing log
+## Your task — a turn-based battle with a self-closing log
 
-In [`project/src/`](project/src/). It **combines every concept in this stage** and builds the
-`Character`/`Enemy` hierarchy the rest of the course reuses (stage 11 will own these through
-`unique_ptr<Character>`):
+The code in [`project/src/`](project/src/) is a **starter**: the class **declarations** are given
+in the `.hpp` headers, but the method bodies (in `character.cpp`, `enemy.cpp`, `battle_log.cpp`)
+and the battle loop in `main.cpp` are stubbed with `TODO`s — you implement them. It **combines
+every concept in this stage** and builds the `Character`/`Enemy` hierarchy the rest of the course
+reuses (stage 11 will own these through `unique_ptr<Character>`):
 
 - **`Character`** — a base class with a constructor + member-init list, `protected` data
   (`name_`, `hp_`, `attack_`, `defense_`), `const` getters, and a `virtual void take_turn(...)`
@@ -255,12 +257,14 @@ In [`project/src/`](project/src/). It **combines every concept in this stage** a
   **destructor does real cleanup** — it prints a closing summary with the number of rounds
   logged, automatically, when `main` returns.
 
+Build & run your version:
+
 ```bash
 cmake -S . -B build && cmake --build build
 ./build/battle
 ```
 
-Expected output:
+Expected output once implemented:
 
 ```
 === Aria vs Goblin ===
@@ -281,6 +285,14 @@ Winner: Aria the Bold (13 hp left)
 Notice the final line: nothing in `main` calls it. The `BattleLog` destructor printed it on its
 own when `log` left scope. That's RAII, demonstrated rather than described.
 
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — it is self-contained
+with its own `CMakeLists.txt`. Try it yourself first, then compare:
+
+```bash
+cmake -S project/solution -B build-solution && cmake --build build-solution
+./build-solution/battle
+```
+
 ---
 
 ## Checklist before moving on
@@ -292,7 +304,8 @@ own when `log` left scope. That's RAII, demonstrated rather than described.
 - [ ] I can explain encapsulation in terms of *invariants*, not secrecy.
 - [ ] I can derive a class, `override` a `virtual` method, and predict which version runs through
       a base pointer/reference — and I know why a base class needs a `virtual` destructor.
-- [ ] I can state what RAII is, and I saw a destructor do real cleanup automatically at scope exit.
+- [ ] I implemented the mini-project starter (`project/src/`), and I can state what RAII is — the
+      `BattleLog` destructor I wrote did real cleanup automatically at scope exit.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — cppreference on constructors,
 `virtual`, and destructors; the C++ Core Guidelines sections on classes and RAII; and the

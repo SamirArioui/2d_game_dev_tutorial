@@ -1,3 +1,9 @@
+// Stage 25 mini-project — the data-driven level parser (implementation) — YOUR TASK.
+//
+// This is the STARTER: parse_level() is stubbed with a TODO and a placeholder return so the
+// project compiles and links, but tests/test_level_config.cpp FAILS until you implement it. The
+// declarations live in level_config.hpp; the `trim` helper and the file-opening load_level()
+// wrapper are provided for you. A complete reference is in ../solution/src/level_config.cpp.
 #include "game/level_config.hpp"
 
 #include <fstream>
@@ -21,37 +27,16 @@ std::string trim(const std::string& s) {
 }  // namespace
 
 LevelConfig parse_level(std::istream& in) {
-    LevelConfig config;
-    std::string line;
-
-    while (std::getline(in, line)) {
-        // Everything from a '#' to end-of-line is a comment — drop it.
-        const auto hash = line.find('#');
-        if (hash != std::string::npos) {
-            line.erase(hash);
-        }
-
-        std::istringstream tokens(line);
-        std::string key;
-        if (!(tokens >> key)) {
-            continue;  // blank line (or a line that was only a comment)
-        }
-
-        if (key == "title") {
-            std::string rest;
-            std::getline(tokens, rest);  // the remainder of the line, so titles may have spaces
-            config.title = trim(rest);
-        } else if (key == "size") {
-            tokens >> config.width >> config.height;
-        } else if (key == "entity") {
-            EntitySpec spec;
-            tokens >> spec.x >> spec.y >> spec.texture;
-            config.entities.push_back(spec);
-        }
-        // Any other key is ignored on purpose — forward-compatible with new directives.
-    }
-
-    return config;
+    // TODO(stage 25): read `in` line by line and build a LevelConfig. For each line:
+    //   1. Drop a trailing comment: erase everything from the first '#' to end-of-line.
+    //   2. Read the first whitespace-delimited token as the directive `key` (an istringstream over
+    //      the line is handy); a line with no token (blank / comment-only) is skipped.
+    //   3. Dispatch on `key`:
+    //        "title"  -> the REST of the line is the title (may contain spaces); trim() it.
+    //        "size"   -> read two ints into config.width and config.height.
+    //        "entity" -> read x, y (floats) then a texture path into an EntitySpec; append it.
+    //      Any other key is ignored on purpose (forward-compatible with new directives).
+    return {};  // placeholder
 }
 
 LevelConfig load_level(const std::string& path) {

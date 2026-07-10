@@ -243,9 +243,11 @@ Try each yourself before peeking at the solution.
 
 ---
 
-## Mini-project — pointer swap + a heap-allocated linked list
+## Your task — pointer swap + a heap-allocated linked list
 
-In [`project/src/main.cpp`](project/src/main.cpp). It **combines every concept in this stage**:
+[`project/src/main.cpp`](project/src/main.cpp) is a **starter** with `TODO`s — you implement it,
+**combining every concept in this stage**. `main()` already drives the demo; you fill in the four
+stubbed functions:
 
 - a **pointer-based `swap_ints`** (`swap_ints(&a, &b)`);
 - a **singly linked list built on the heap** — a `struct Node { int value; Node* next; };`,
@@ -253,17 +255,19 @@ In [`project/src/main.cpp`](project/src/main.cpp). It **combines every concept i
   (walks pointers to `nullptr`), and `free_list` (a matching `delete` for every `new`);
 - `nullptr` as both the empty-list value and the end-of-chain marker.
 
-Because ownership is clean — every `new` is matched by a `delete` — the program is **silent under
-AddressSanitizer**. That's the other half of the ASan lesson: a *correct* program produces *no*
-report. (In stage 07 a destructor will do `free_list`'s job automatically; in stage 11 a smart
-pointer will.)
+Because ownership is clean — every `new` is matched by a `delete` — a correct program is **silent
+under AddressSanitizer**. That's the other half of the ASan lesson: a *correct* program produces
+*no* report. (In stage 07 a destructor will do `free_list`'s job automatically; in stage 11 a
+smart pointer will.)
+
+Build & run your version (ASan is ON by default for this stage):
 
 ```bash
 cmake -S . -B build && cmake --build build
 ./build/swap_and_list
 ```
 
-Expected output:
+Expected output once implemented:
 
 ```
 before swap: a=7 b=99
@@ -271,6 +275,14 @@ after  swap: a=99 b=7
 
 list:       [1 -> 2 -> 3]
 after free: []
+```
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — it is self-contained
+with its own `CMakeLists.txt`. Try it yourself first, then compare:
+
+```bash
+cmake -S project/solution -B build-solution && cmake --build build-solution
+./build-solution/swap_and_list
 ```
 
 ---
@@ -285,7 +297,8 @@ after free: []
       know what a use-after-free, double-free, and leak are.
 - [ ] I built a program with `-fsanitize=address,undefined` and read a report top-down: the bug
       kind, the offending access, the `freed here`, and the `allocated here`.
-- [ ] My mini-project runs clean under ASan (no report), and I understand *why* that's the goal.
+- [ ] I implemented the mini-project starter (`project/src/main.cpp`); it runs clean under ASan
+      (no report), and I understand *why* that's the goal.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — cppreference on pointers/references,
 and the AddressSanitizer docs. Paste the linked list into godbolt.org to see the `new`/`delete`

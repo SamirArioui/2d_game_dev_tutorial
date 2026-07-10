@@ -1,5 +1,21 @@
 // ============================================================================
-// Stage 09 mini-project — Inventory (implementation)
+// Stage 09 mini-project — Inventory (implementation) — YOUR TASK
+// ============================================================================
+//
+// This is the STARTER. Implement each method below using what the README taught
+// (std::vector, std::unordered_map, std::sort + a lambda comparator, and a stored
+// std::function predicate) so the demo in src/main.cpp prints the keyed / sorted /
+// filtered output shown in the README.
+//
+// The declarations you are implementing against are in inventory.hpp. The starter
+// already compiles and links (each body has a placeholder), but the output is wrong
+// until you fill the TODOs in.
+//
+// A complete reference is in ../solution/src/inventory.cpp — try it yourself first.
+//
+// Build & run (from this stage folder):
+//   cmake -S . -B build && cmake --build build
+//   ./build/stage09_inventory
 // ============================================================================
 #include "inventory.hpp"
 
@@ -7,43 +23,31 @@
 #include <iterator>   // std::back_inserter
 
 void Inventory::add(const std::string& name, int value, int count) {
-    // Is this a brand-new item, or one we already carry?
-    // .count() on the map is our fast "is this key present?" check.
-    if (counts_.count(name) == 0) {
-        items_.push_back(Item{name, value});  // first time: record the distinct item
-    }
-    counts_[name] += count;  // operator[] inserts 0 for a new key, then adds
+    // TODO(stage 09): if `name` is not already a key in counts_, push_back a new
+    // Item{name, value} onto items_ so each DISTINCT item appears exactly once.
+    // Then add `count` to counts_[name] (operator[] inserts 0 for a new key first).
 }
 
 int Inventory::total_value() const {
-    int total = 0;
-    for (const Item& it : items_) {
-        // .at() throws if the key is missing — here it can't be, since every item
-        // in items_ was registered in counts_ by add().
-        total += it.value * counts_.at(it.name);
-    }
-    return total;
+    // TODO(stage 09): sum each item's value * counts_.at(it.name) over items_.
+    return 0;  // placeholder
 }
 
 int Inventory::count_of(const std::string& name) const {
-    auto found = counts_.find(name);           // find returns an iterator...
-    return found == counts_.end() ? 0 : found->second;  // ...== end() means "not present"
+    // TODO(stage 09): look `name` up in counts_ (find) and return its quantity,
+    // or 0 if the key is not present.
+    return 0;  // placeholder
 }
 
 std::vector<Item> Inventory::sorted_by_value(bool descending) const {
-    std::vector<Item> copy = items_;  // sort a copy; don't disturb insertion order
-
-    // The lambda comparator answers "should a come before b?". Capturing
-    // `descending` lets one lambda serve both directions.
-    std::sort(copy.begin(), copy.end(), [descending](const Item& a, const Item& b) {
-        return descending ? a.value > b.value : a.value < b.value;
-    });
-    return copy;
+    // TODO(stage 09): copy items_, then std::sort the copy with a LAMBDA comparator
+    // that captures `descending` (a.value < b.value ascending, a.value > b.value
+    // descending). Return the sorted copy so insertion order is left untouched.
+    return {};  // placeholder
 }
 
 std::vector<Item> Inventory::matching(const std::function<bool(const Item&)>& keep) const {
-    std::vector<Item> out;
-    // copy_if appends each item that satisfies the stored predicate.
-    std::copy_if(items_.begin(), items_.end(), std::back_inserter(out), keep);
-    return out;
+    // TODO(stage 09): return the items for which the stored predicate `keep` returns
+    // true — e.g. std::copy_if(items_.begin(), items_.end(), std::back_inserter(out), keep).
+    return {};  // placeholder
 }

@@ -179,7 +179,7 @@ cd project
 # --- Fast path: tests only (no SFML, no display) ---
 cmake -S . -B build -DBUILD_APP=OFF
 cmake --build build
-ctest --test-dir build --output-on-failure        # 8 tests, all green
+ctest --test-dir build --output-on-failure        # 8 tests — RED until you implement the TODOs
 
 # --- Full path: also build the SFML demo ---
 cmake -S . -B build
@@ -221,25 +221,45 @@ In [`exercises/`](exercises/). Starter `NN_name.cpp` + reference `NN_name.soluti
 
 ---
 
-## Mini-project — a data-driven screen through the ResourceManager
+## Your task — a data-driven screen through the ResourceManager
 
-In [`project/`](project/). It **combines every concept in the stage**:
+**Your task.** [`project/`](project/) is a **starter**: the struct declarations, the demo in
+[`src/main.cpp`](project/src/main.cpp), the `assets/` and the tests are all given, but two pieces
+are stubbed with `TODO`s for you to implement:
 
-- reads [`assets/level.txt`](project/assets/level.txt) via `load_level` (data-driven design, file
-  I/O);
-- builds a sprite per `EntitySpec`, fetching each texture through
-  `res::ResourceManager<sf::Texture>` so repeats are cached (templated manager + caching);
-- shares one texture instance across many sprites (reference return, `unique_ptr` ownership);
-- degrades to a magenta placeholder on a bad path;
-- and its caching is proven by unit tests, with no display required.
+- **`ResourceManager<T>::get`** (plus `is_cached` / `size` / `clear`) in
+  [`include/res/resource_manager.hpp`](project/include/res/resource_manager.hpp) — load-on-first-use
+  + caching, returning `T&` (note it's a header template, so the bodies live in the header);
+- **`parse_level`** in [`src/level_config.cpp`](project/src/level_config.cpp) — the data-driven
+  config parser (`trim` and the `load_level` file wrapper are provided).
 
-Build + link is verified; on-screen rendering is unverified-by-execution (CI has no display), but
-the asset pipeline and caching are exercised by the tests.
+The starter compiles and links, but `ctest` is **RED** until you fill in the `TODO`s — work through
+[`tests/test_resource_manager.cpp`](project/tests/test_resource_manager.cpp) and
+[`tests/test_level_config.cpp`](project/tests/test_level_config.cpp) until green. When done it
+**combines every concept in the stage**: `main` reads `assets/level.txt` via `load_level`
+(data-driven design, file I/O), builds a sprite per `EntitySpec` fetching each texture through
+`res::ResourceManager<sf::Texture>` so repeats are cached, shares one texture instance across many
+sprites (reference return, `unique_ptr` ownership), and degrades to a magenta placeholder on a bad
+path.
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
+(it has its own `CMakeLists.txt`) and compare:
+
+```bash
+cmake -S project/solution -B project/solution/build -DBUILD_APP=OFF
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # all green
+```
+
+Build + link of your version is verified; on-screen rendering is unverified-by-execution (CI has no
+display), but the asset pipeline and caching are exercised by the tests.
 
 ---
 
 ## Checklist before moving on
 
+- [ ] I implemented the mini-project starter (`ResourceManager<T>` + `parse_level`) so `ctest` is
+      green.
 - [ ] I can explain why loading each asset once and sharing it (by reference) beats copying.
 - [ ] I implemented `get` with load-on-first-use caching and understand why it returns `T&`.
 - [ ] I know why the cache stores `unique_ptr<T>` (RAII cleanup + stable address across rehash).

@@ -1,7 +1,14 @@
 #pragma once
 
 // ===========================================================================
-// gmath — the course's small game-math library.
+// gmath — the course's small game-math library.                    (YOUR TASK)
+//
+// This header is the STARTER: the declarations are given (the namespace, the Vec2<T> struct with
+// members `T x, y;`, every operator/method SIGNATURE, the Vec2f alias, and the clamp<T>
+// signature) but the BODIES are stubbed with TODOs and placeholder returns. Implementing them IS
+// this stage's mini-project. Do NOT change the signatures or add extra operations.
+//
+// A complete reference is in ../../solution/include/vec2.hpp — try it yourself first.
 //
 // Everything math-y lives in the `gmath` namespace so names like Vec2 or clamp never collide
 // with the standard library or with your own code. A namespace is C++'s answer to a Python
@@ -26,17 +33,29 @@ struct Vec2 {
     // operator+ : vector addition. Overloading '+' is the C++ version of Python's
     // __add__(self, other). It's a const method (it reads, doesn't mutate) and takes the other
     // vector by const& (no copy). It returns a brand-new Vec2 rather than modifying either input.
-    Vec2 operator+(const Vec2& other) const { return Vec2{x + other.x, y + other.y}; }
+    Vec2 operator+(const Vec2& other) const {
+        // TODO(stage 08): return a new Vec2 whose x/y are the component-wise sums.
+        return Vec2{};
+    }
 
     // operator- : vector subtraction (Python's __sub__).
-    Vec2 operator-(const Vec2& other) const { return Vec2{x - other.x, y - other.y}; }
+    Vec2 operator-(const Vec2& other) const {
+        // TODO(stage 08): return a new Vec2 whose x/y are the component-wise differences.
+        return Vec2{};
+    }
 
     // operator* : scale by a SCALAR of the same type T (Python's __mul__). This is v * 2.0f,
     // not vector-times-vector — there is no single "correct" vector*vector, so we don't define it.
-    Vec2 operator*(T scalar) const { return Vec2{x * scalar, y * scalar}; }
+    Vec2 operator*(T scalar) const {
+        // TODO(stage 08): return a new Vec2 with each component multiplied by `scalar`.
+        return Vec2{};
+    }
 
     // operator== : component-wise equality (Python's __eq__). Handy for the unit tests in stage 13.
-    bool operator==(const Vec2& other) const { return x == other.x && y == other.y; }
+    bool operator==(const Vec2& other) const {
+        // TODO(stage 08): return true only when BOTH x and y match.
+        return false;
+    }
 };
 
 // A convenience ALIAS for the common float case. `using` here works like a typedef: `Vec2f` and
@@ -50,12 +69,7 @@ using Vec2f = Vec2<float>;
 // It lives in gmath alongside Vec2 as a general-purpose scalar utility (it is NOT a Vec2 method).
 template <class T>
 T clamp(T v, T lo, T hi) {
-    if (v < lo) {
-        return lo;
-    }
-    if (v > hi) {
-        return hi;
-    }
+    // TODO(stage 08): return lo if v < lo, hi if v > hi, otherwise v (using only '<' / '>').
     return v;
 }
 

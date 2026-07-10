@@ -1,5 +1,12 @@
 // ============================================================================
-// Tests for save/load — the round-trip property and the empty-optional case.
+// Tests for save/load — the round-trip property and the empty-optional case.   (YOUR TASK)
+//
+// This is the STARTER. save()/load() are already complete — YOUR job is to write
+// the assertions. Each case below keeps its arrange/act/cleanup scaffolding;
+// replace every `// TODO(stage 13): assert ...` with a real REQUIRE(...) /
+// CHECK(...), then DELETE the `FAIL("implement me")` line so the case can go
+// green. Until you do, `ctest` is RED on purpose.
+// Reference: ../../solution/tests/test_save_load.cpp.
 //
 // Save/load DOES touch the outside world (a file), so it isn't as pure as the
 // math functions. We still make it testable by:
@@ -36,27 +43,30 @@ TEST_CASE("save then load returns equivalent data (round-trip)", "[saveload]") {
     original.inventory.add(Item{"Iron Sword", 120}, 1);
 
     // Act: write it, then read it back.
-    REQUIRE(save(path, original));
+    // TODO(stage 13): REQUIRE that save(path, original) returns true.
+    save(path, original);
     const std::optional<SaveData> loaded = load(path);
 
     // Assert: the optional is engaged, and every field survived the trip.
-    REQUIRE(loaded.has_value());
-    CHECK(loaded->stats.hp == 30);
-    CHECK(loaded->stats.attack == 12);
-    CHECK(loaded->stats.defense == 8);
-    CHECK(loaded->inventory.distinct_count() == 2);
-    CHECK(loaded->inventory.count_of("Health Potion") == 3);
-    CHECK(loaded->inventory.count_of("Iron Sword") == 1);
-    CHECK(loaded->inventory.total_value() == 120 + 15 * 3);
+    // TODO(stage 13): REQUIRE loaded.has_value()
+    // TODO(stage 13): CHECK the stats survived: hp==30, attack==12, defense==8
+    // TODO(stage 13): CHECK the inventory survived: distinct_count()==2,
+    //   count_of("Health Potion")==3, count_of("Iron Sword")==1,
+    //   total_value()==120 + 15*3
+    (void)loaded;  // remove once you assert on `loaded`
 
     std::remove(path.c_str());  // clean up so the next run starts fresh
+    FAIL("implement me — write the assertions above, then delete this line");
 }
 
 TEST_CASE("load of a missing file returns an empty optional", "[saveload]") {
     // The key contract: load reports "nothing" via std::nullopt instead of
     // crashing or returning a half-built object. Python: the `None` branch.
     const std::optional<SaveData> missing = load("this_file_does_not_exist.tmp");
-    REQUIRE_FALSE(missing.has_value());
+    // TODO(stage 13): REQUIRE_FALSE(missing.has_value())
+    (void)missing;  // remove once you assert on `missing`
+
+    FAIL("implement me — write the assertion above, then delete this line");
 }
 
 TEST_CASE("load of a malformed file returns an empty optional", "[saveload]") {
@@ -65,13 +75,15 @@ TEST_CASE("load of a malformed file returns an empty optional", "[saveload]") {
     {
         // Write garbage that can't be parsed as a header.
         std::FILE* f = std::fopen(path.c_str(), "w");
-        REQUIRE(f != nullptr);
+        // TODO(stage 13): REQUIRE(f != nullptr) before writing to it
         std::fputs("not a valid save file\n", f);
         std::fclose(f);
     }
 
     const std::optional<SaveData> bad = load(path);
-    REQUIRE_FALSE(bad.has_value());
+    // TODO(stage 13): REQUIRE_FALSE(bad.has_value())
+    (void)bad;  // remove once you assert on `bad`
 
     std::remove(path.c_str());
+    FAIL("implement me — write the assertions above, then delete this line");
 }

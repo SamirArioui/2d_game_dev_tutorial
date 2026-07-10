@@ -1,16 +1,26 @@
 // ============================================================================
-// Stage 00 mini-project — Character-sheet printer
+// Stage 00 mini-project — Character-sheet printer  (YOUR TASK)
 // ============================================================================
 //
-// Combines everything from stage 00:
-//   - #include to bring in the iostream library
-//   - int main() as the program's entry point
-//   - a multi-line std::cout block mixing text and NUMERIC LITERALS
-//   - a clean `return 0;` to report success
+// This is the STARTER. Implement it yourself using what the README taught:
+// #include, int main(), a multi-line std::cout block mixing text and numeric
+// literals, and a clean `return 0;`.
 //
-// The values are hardcoded literals for now. In stage 01 they become real typed
-// variables (int / std::string / ...); in stage 02 the derived stats get computed
-// by functions. This character (Aria the Bold) recurs throughout the course.
+// A complete reference is in ../solution/src/main.cpp — try it yourself first.
+//
+// GOAL — make the program print exactly this character sheet:
+//
+//   ============================
+//      CHARACTER SHEET
+//   ============================
+//    Name : Aria the Bold
+//    Class: Ranger
+//    Level: 3
+//   ----------------------------
+//    HP     : 30
+//    Attack : 12
+//    Defense: 8
+//   ============================
 //
 // Build & run:
 //   clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o character_sheet
@@ -21,24 +31,17 @@
 #include <iostream>
 
 int main() {
-    // Header banner. "\n" ends each interior line; std::endl ends the block and flushes.
-    std::cout << "============================\n";
-    std::cout << "   CHARACTER SHEET\n";
-    std::cout << "============================\n";
+    // TODO(stage 00): print the banner ("====", "   CHARACTER SHEET", "====").
 
-    // Identity block — text values.
-    std::cout << " Name : " << "Aria the Bold" << "\n";
-    std::cout << " Class: " << "Ranger" << "\n";
-    std::cout << " Level: " << 3 << "\n";
+    // TODO(stage 00): print the identity block (Name / Class / Level) — mix
+    // text with the numeric literal 3 for the level.
 
-    std::cout << "----------------------------\n";
+    // TODO(stage 00): print the divider line ("----").
 
-    // Combat stats — integer literals sent straight to the stream (no quotes).
-    std::cout << " HP     : " << 30 << "\n";
-    std::cout << " Attack : " << 12 << "\n";
-    std::cout << " Defense: " << 8 << "\n";
+    // TODO(stage 00): print the three combat stats (HP 30, Attack 12, Defense 8)
+    // as integer literals sent straight to std::cout.
 
-    std::cout << "============================" << std::endl;
+    // TODO(stage 00): print the closing banner line.
 
-    return 0;  // success
+    return 0;  // success — leave this last
 }

@@ -165,6 +165,11 @@ Two pitfalls:
 **Toolchain:** CMake ≥ 3.16 and a C++17 compiler. The first configure **git-clones SFML 2.6.1**
 (and Catch2) via `FetchContent`, so it needs network the first time.
 
+The mini-project in [`project/`](project/) ships as a **starter**: the SFML boilerplate and the
+sprite-sheet/text setup are complete, but the `anim` frame-math bodies in
+[`project/src/animation.cpp`](project/src/animation.cpp) are left as `TODO`s, so out of the box
+`ctest` is **RED**. You implement them to make it green.
+
 ```bash
 cd project
 # The first configure clones SFML 2.6.1 + Catch2. If your default compiler's
@@ -173,7 +178,7 @@ cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 cmake --build build
 
 # Run the pure logic tests (headless-friendly — this is what CI runs):
-ctest --test-dir build --output-on-failure
+ctest --test-dir build --output-on-failure    # RED until you implement animation.cpp
 
 # Run the animated app (needs a display / GPU):
 ./build/walk_cycle            # arrow keys walk; a label shows state + frame
@@ -181,6 +186,15 @@ ctest --test-dir build --output-on-failure
 
 > **Tip:** to iterate on just the tested logic without compiling SFML at all:
 > `cmake --build build --target anim_tests && ctest --test-dir build`.
+
+The complete, all-green reference is in [`project/solution/`](project/solution/) — build it the
+same way to see `100% tests passed`:
+
+```bash
+cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure
+```
 
 **On this course's headless build machine**, the app is verified to **compile and link** against
 SFML; its on-screen behavior is *unverified-by-execution*. The frame math it relies on is fully
@@ -218,7 +232,16 @@ cmake --build build
 
 ## Mini-project — animated walk-cycle sprite with a label
 
-In [`project/`](project/). It **combines every concept of the stage**:
+**Your task.** In [`project/`](project/). The SFML shell is done for you — the procedurally-built
+sprite sheet, the texture/sprite lifetime setup, the `sf::Text` label, and the game loop in
+[`src/main.cpp`](project/src/main.cpp) are all complete. What's left is the **frame math**: the
+`anim::Animator` and free-function bodies in
+[`src/animation.cpp`](project/src/animation.cpp) are stubbed with `// TODO(stage 17)` placeholders,
+so the starter compiles and links but [`tests/test_animation.cpp`](project/tests/test_animation.cpp)
+starts **RED**. Implement `frame_index`, `frame_to_rect`, and the `Animator` methods (`set_state`,
+`update`, `current_frame_in_clip`, `current_sheet_frame`) until `ctest` is green.
+
+The finished project **combines every concept of the stage**:
 
 - a 5-frame sprite sheet **built procedurally** with `sf::Image` (idle pose + 4 walk frames),
 - an `sf::Texture` that **outlives** its `sf::Sprite` (RAII, both locals in `main`),
@@ -230,6 +253,10 @@ Arrow keys walk the character (mirrored to face its direction). The logic split 
 library + thin SFML `main` — is exactly the pattern the rest of the course scales up: the ball and
 paddles in **Pong** (stage 18) will keep their physics in a tested library and render at the edges
 the same way.
+
+Stuck? The complete reference is in [`project/solution/`](project/solution/) — build it with
+`cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++` and
+compare, but try it yourself first.
 
 ---
 

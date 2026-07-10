@@ -1,6 +1,11 @@
 // ============================================================================
 // Stage 26 mini-project — Pong, ported onto libengine.
 //
+// This file is GIVEN and complete — no TODOs here. It is the boilerplate that
+// shows how small an entry point becomes once the engine owns the loop. Your task
+// is in pong_logic.cpp (the pure rules) and pong_scene.cpp (the Scene); this main()
+// just wires them to the engine.
+//
 // Look how SMALL main() is now. There is no window creation, no event loop, no
 // delta-time clock, no clear/draw/display dance — the ENGINE owns all of that.
 // main() just: configure the app, push the first scene, and run(). Everything

@@ -195,14 +195,19 @@ test suite does for you every day — it turns "I think I broke something" into 
 
 ## Building and running
 
-The mini-project test suite lives in [`project/`](project/):
+The mini-project test suite lives in [`project/`](project/). It ships as a **starter**: the test
+files are scaffolded but the assertions are left for you to write, so out of the box `ctest` is
+**RED** (each case has a `FAIL("implement me")` placeholder). You make it green.
 
 ```bash
 cd project
 cmake -S . -B build                              # first run clones Catch2 (needs network)
 cmake --build build
-ctest --test-dir build --output-on-failure       # -> 100% tests passed
+ctest --test-dir build --output-on-failure       # RED until you write the assertions
 ```
+
+The complete, all-green reference suite is in [`project/solution/`](project/solution/) — build it
+the same way (`cmake -S project/solution -B project/solution/build`) to see `100% tests passed`.
 
 The exercises are their own small project in [`exercises/`](exercises/):
 
@@ -247,8 +252,14 @@ starters you build and run by hand. Ordered easy → hard:
 
 ## Mini-project — a full test suite for the `game` library
 
-In [`project/`](project/). It **combines every concept from this stage** into a real suite over the
-`game` library from stage 12 (carried along here so the stage is self-contained):
+**Your task.** In [`project/`](project/). The `game` library (carried along here so the stage is
+self-contained) and the CMake wiring are **already complete** — the *lesson* of this stage is
+writing tests, so **you write the assertions**. Each test file is a scaffold: the `TEST_CASE` /
+`SECTION` / fixture structure is there with comments describing what to prove, but the bodies hold
+`// TODO(stage 13): assert ...` placeholders and one `FAIL("implement me")` per case, so the suite
+starts **RED**. Replace each TODO with a real `REQUIRE`/`CHECK`, delete the `FAIL` line, and drive
+it to green. It **combines every concept from this stage** into a real suite over the `game`
+library from stage 12:
 
 - [`tests/test_math.cpp`](project/tests/test_math.cpp) — `clamp`/`lerp`/`distance` with `SECTION`s
   and `Catch::Approx` (the 3-4-5 triangle, endpoints, symmetry).
@@ -257,11 +268,15 @@ In [`project/`](project/). It **combines every concept from this stage** into a 
 - [`tests/test_save_load.cpp`](project/tests/test_save_load.cpp) — the save/load **round-trip**, plus
   the two "returns `std::nullopt`" cases (missing file, malformed file).
 
-Wired with `enable_testing()` + `catch_discover_tests`, so one command runs it all:
+Wired with `enable_testing()` + `catch_discover_tests`, so one command runs it all. When your
+assertions are in place you should see:
 
 ```
 100% tests passed, 0 tests failed out of 11
 ```
+
+Stuck? The full green suite is in [`project/solution/tests/`](project/solution/tests/) — try each
+file yourself first, then compare.
 
 This same discipline — logic in a tested library, thin untested rendering on top — is what the SFML
 half of the course is built on.

@@ -142,13 +142,20 @@ SFML 2.6 API).
 **Toolchain:** CMake ≥ 3.16 and a C++17 compiler. First configure git-clones SFML 2.6.1, Dear
 ImGui, imgui-sfml, and Catch2.
 
+The mini-project in [`project/`](project/) ships as a **starter**. The Pong rules are carried over
+**complete** from stage 18 and the ImGui/window boilerplate in
+[`src/main.cpp`](project/src/main.cpp) is done — your only task this stage is the two debug helpers
+in [`src/tunables.cpp`](project/src/tunables.cpp) (`set_ball_speed` and the `FrameProfiler`), which
+are left as `TODO`s. So out of the box `ctest` is **RED** on the tunables tests (the reused
+`test_pong` / `test_collision` already pass); you implement the helpers to turn it fully green.
+
 ```bash
 cd project
 cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 cmake --build build
 
 # Verify the logic behind the widgets, headless (this is what CI runs):
-ctest --test-dir build --output-on-failure
+ctest --test-dir build --output-on-failure    # RED (test_tunables) until you implement tunables.cpp
 
 # Play with the overlay (needs a display):
 ./build/pong_imgui        # drag "Ball speed"; toggle Pause; watch FPS
@@ -156,6 +163,15 @@ ctest --test-dir build --output-on-failure
 
 > Logic-only loop (skips SFML/ImGui entirely):
 > `cmake --build build --target pong_tests && ctest --test-dir build`.
+
+The complete, all-green reference is in [`project/solution/`](project/solution/) — build it the
+same way to see `100% tests passed`:
+
+```bash
+cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure
+```
 
 **On this course's headless build machine**, `pong_imgui` is verified to **compile and link**
 against SFML + Dear ImGui + imgui-sfml; the overlay and window are *unverified-by-execution*. The
@@ -188,8 +204,17 @@ cmake --build build
 
 ## Mini-project — Pong with an ImGui overlay
 
-In [`project/`](project/). The stage-18 Pong, unchanged in its rules (still the tested `pong_core`
-library), now with a debug panel that:
+**Your task.** In [`project/`](project/). This is the stage-18 Pong, unchanged in its rules (still
+the tested `pong_core` library, carried over complete), plus an ImGui debug panel. The ImGui
+lifecycle and all the widget wiring in [`src/main.cpp`](project/src/main.cpp) are done for you — the
+only code left to write is the pure logic *behind* two of the widgets, stubbed with `// TODO(stage
+19)` in [`src/tunables.cpp`](project/src/tunables.cpp): `debug::set_ball_speed` (the slider's
+rescale-keeping-direction math) and `debug::FrameProfiler` (the rolling-average FPS ring buffer).
+The starter compiles and links, but [`tests/test_tunables.cpp`](project/tests/test_tunables.cpp)
+starts **RED** (the reused `test_pong` / `test_collision` are already green). Implement the two
+helpers until `ctest` is fully green.
+
+The finished panel:
 
 - shows a **live FPS** and average frame time (`debug::FrameProfiler`),
 - exposes a **ball-speed slider** that rescales the ball's velocity *live* (`debug::set_ball_speed`),
@@ -200,6 +225,10 @@ The takeaway is architectural as much as visual: the overlay is a thin skin over
 added without touching the game rules at all. That "instrument the game through a debug UI" habit
 carries straight into the engine stages, where the panel grows to inspect scenes, resources, and
 particle counts.
+
+Stuck? The complete reference is in [`project/solution/`](project/solution/) — build it with
+`cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++` and
+compare, but try it yourself first.
 
 ---
 

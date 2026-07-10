@@ -271,26 +271,31 @@ clang++ -std=c++17 -Wall -Wextra 02_split_across_files.cpp 02_split_across_files
 
 ---
 
-## Mini-project — split the game-math library
+## Your task — split the game-math library
 
-In [`project/src/`](project/src/). It combines **every** concept from this stage across **four
-translation units and three headers**:
+**You implement it.** [`project/src/`](project/src/) is a **starter** that combines **every**
+concept from this stage across **four translation units and three headers**:
 
 ```
 project/src/
-  mathutils.hpp   # DECLARATIONS: clamp / lerp / distance          (#pragma once)
-  mathutils.cpp   # DEFINITIONS of those three functions
-  player.hpp      # a shared TYPE: struct Player { std::string name; int hp; } + print_player() (#pragma once)
-  player.cpp      # DEFINITION of print_player
-  main.cpp        # includes both HEADERS; uses the library; holds main()
+  mathutils.hpp   # DECLARATIONS: clamp / lerp / distance          (#pragma once) — GIVEN (the contract)
+  mathutils.cpp   # DEFINITIONS of those three functions           — YOU fill in the bodies
+  player.hpp      # a shared TYPE: struct Player { std::string name; int hp; } + print_player() (#pragma once) — GIVEN
+  player.cpp      # DEFINITION of print_player                     — YOU fill in the body
+  main.cpp        # includes both HEADERS; uses the library; holds main() — YOU fill in main()
 ```
 
-`main.cpp` includes only the two *headers* (the declarations); the *definitions* come from
-`mathutils.cpp` and `player.cpp` and are joined by the linker. `struct Player` demonstrates a type
+The two **headers are given** — they're the *contract* (the declarations every file agrees on).
+Your job is to write the **definitions**: fill in each `// TODO(stage 04)` in `mathutils.cpp`,
+`player.cpp`, and `main.cpp`. The starter already compiles and links (the bodies are stubbed with
+placeholders); as you replace each stub the program grows toward the expected output below.
+
+`main.cpp` includes only the two *headers* (the declarations); the *definitions* you write in
+`mathutils.cpp` and `player.cpp` are joined by the linker. `struct Player` demonstrates a type
 shared across TUs: both `main.cpp` and `player.cpp` include `player.hpp`, so both agree on its
 layout.
 
-Build & run:
+Build & run your version (list every `.cpp`; headers are NOT listed — they're `#include`d):
 
 ```bash
 clang++ -std=c++17 -Wall -Wextra \
@@ -299,7 +304,7 @@ clang++ -std=c++17 -Wall -Wextra \
 ./mathgame
 ```
 
-Expected output:
+Expected output once every `TODO` is done:
 
 ```
 === Stage 04 — multi-file math demo ===
@@ -320,6 +325,15 @@ Healing 8 -> 30 over 5 frames (lerp):
 Distance to chest: 5
 ```
 
+Stuck? A complete reference is in [`project/solution/src/`](project/solution/src/) — try it
+yourself first, then compare:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra \
+    project/solution/src/main.cpp project/solution/src/mathutils.cpp project/solution/src/player.cpp \
+    -o mathgame
+```
+
 **Poke it to learn:** delete `#pragma once` from `player.hpp` and add a second
 `#include "player.hpp"` to `main.cpp` → *redefinition of 'Player'* (a compile error). Or leave
 `mathutils.cpp` off the link command → *undefined symbols* for `clamp`/`lerp`/`distance` (a link
@@ -333,6 +347,8 @@ each error comes from.
 
 ## Checklist before moving on
 
+- [ ] I implemented the mini-project starter (`project/src/`) — filled in `main.cpp`,
+      `mathutils.cpp`, and `player.cpp` — and it links and prints the expected output.
 - [ ] I can state the difference between a **declaration** and a **definition**.
 - [ ] I know why `.hpp` holds declarations and `.cpp` holds definitions, and that headers are
       never passed to the compiler directly.

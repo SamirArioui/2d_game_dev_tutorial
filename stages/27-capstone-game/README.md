@@ -133,14 +133,15 @@ walls keep the player in.
  ├── engine/            a SELF-CONTAINED copy of libengine (identical to stage 26)
  ├── project/
  │   ├── CMakeLists.txt fetch SFML+Catch2, add ../engine, build capstone + tests
- │   ├── assets/level.txt   the tilemap (24×16, 32px tiles) — data-driven
+ │   ├── assets/level.txt   the tilemap (24×16, 32px tiles) — data-driven (given)
  │   ├── src/
- │   │   ├── inventory.{hpp,cpp}   game::Inventory       ── PURE (tested)
- │   │   ├── save_data.{hpp,cpp}   Stats+Inventory+pos   ── PURE (tested)
- │   │   ├── world.{hpp,cpp}       resolve_move, try_pickup ── PURE (tested)
- │   │   ├── explore_scene.{hpp,cpp}  the Scene (SFML)
- │   │   └── main.cpp             configure → push scene → run()
- │   └── tests/         Catch2 tests for the pure logic
+ │   │   ├── inventory.{hpp,cpp}   game::Inventory       ── PURE (tested) · YOU implement
+ │   │   ├── save_data.{hpp,cpp}   Stats+Inventory+pos   ── PURE (tested) · YOU implement
+ │   │   ├── world.{hpp,cpp}       resolve_move, try_pickup ── PURE (tested) · YOU implement
+ │   │   ├── explore_scene.{hpp,cpp}  the Scene (SFML) — wiring given, glue YOU implement
+ │   │   └── main.cpp             configure → push scene → run()  (given, complete)
+ │   ├── tests/         Catch2 tests for the pure logic (RED until you implement)
+ │   └── solution/      complete REFERENCE (its own standalone build)
  └── exercises/         SFML-free drills on the game logic
 ```
 
@@ -155,8 +156,8 @@ independently buildable, which is the course's convention.)
 ```bash
 cd stages/27-capstone-game/project
 cmake -S . -B build            # FIRST run clones SFML 2.6.1 + Catch2 v3.7.1 (needs network)
-cmake --build build
-ctest --test-dir build --output-on-failure   # PURE-logic tests -> all green, headless
+cmake --build build            # builds the given engine + your (stubbed) game
+ctest --test-dir build --output-on-failure   # PURE-logic tests — RED until you implement the logic
 ./build/capstone               # opens the game window (needs a display)
 ```
 
@@ -198,12 +199,37 @@ ctest --test-dir build --output-on-failure    # the SOLUTIONS -> all green
 
 ---
 
-## Mini-project — the game itself
+## Your task — build the capstone game
 
-In [`project/`](project/). This *is* the capstone. Walk around with WASD, grab the five items,
-watch the sparks and hear the ding, check the HUD update, then `F5` to save and `F9` to reload —
-you snap back to the saved spot with the saved bag. Everything you learned across 28 stages is in
-that loop:
+In [`project/`](project/). The engine in [`engine/`](engine/) is **provided complete**, and so is
+the scene's window/rendering wiring — you write **no** engine code. Your task is the GAME: the pure
+gameplay rules plus the thin glue that drives them. The starter already builds, links and opens a
+window (every game body is a placeholder), but the tests are **RED** until you implement:
+
+- **`src/world.cpp`** — `resolve_move` (axis-separated tile collision) and `try_pickup` (item
+  collection). Pure; covered by `tests/test_world.cpp`.
+- **`src/inventory.cpp`** — the `game::Inventory` methods. Pure; `tests/test_inventory.cpp`.
+- **`src/save_data.cpp`** — `save` / `load` of stats + inventory + position. Pure;
+  `tests/test_save_load.cpp`.
+- **`src/explore_scene.cpp`** — the GLUE: `update()` (movement + pickup + feedback), `save_game()`
+  and `load_game()`. The constructor, `render()`, input dispatch and HUD are given.
+
+`main.cpp`, the class/type headers, `assets/level.txt` and the `tests/` are all given. Work the pure
+logic first — run `ctest` until it goes green — then fill in the scene glue and play it: walk around
+with WASD, grab the five items, watch the sparks and hear the ding, check the HUD update, then `F5`
+to save and `F9` to reload — you snap back to the saved spot with the saved bag.
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) (a self-contained,
+standalone build). Try it yourself first, then compare:
+
+```bash
+cmake -S project/solution -B project/solution/build
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # all green
+./project/solution/build/capstone                              # opens a window (needs a display)
+```
+
+Everything you learned across the course is in that loop:
 
 - **C++ core & memory** (00–11): values vs references, `const`-correctness, RAII (textures/sound
   buffers freed automatically), smart pointers (`unique_ptr<Scene>` in the stack), templates
@@ -226,7 +252,7 @@ that loop:
 
 ## Checklist — you've finished the course
 
-- [ ] I built the capstone, ran `ctest` (collision, pickup, inventory, save/load — all green).
+- [ ] I implemented the pure game logic (`world.cpp`, `inventory.cpp`, `save_data.cpp`) and the scene glue (`explore_scene.cpp`); `ctest` (collision, pickup, inventory, save/load) is all green.
 - [ ] I can point to each engine subsystem in `ExploreScene` and say what it contributes.
 - [ ] I can explain why the game *rules* are pure functions and how that makes them testable.
 - [ ] I understand this game reuses the stage-26 `Application`/engine unchanged — only the game is new.

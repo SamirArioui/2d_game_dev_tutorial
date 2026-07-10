@@ -2,7 +2,13 @@
 
 // ===========================================================================
 // ResourceManager<T> — a templated, caching loader. THE shared contract stage 26 lifts into the
-// engine.
+// engine.                                                                        (YOUR TASK)
+//
+// This header is the STARTER: the class, every method SIGNATURE and the cache_ storage are given,
+// but the method BODIES are stubbed with TODOs and placeholder returns. Implementing them is part
+// of this stage's mini-project; the project still compiles but tests/test_resource_manager.cpp
+// FAILS until you fill them in. A complete reference is in
+// ../../solution/include/res/resource_manager.hpp — try it yourself first.
 //
 // The problem it solves: loading a texture from disk is slow, and two entities that use the same
 // image must NOT each hold their own copy (sf::Texture can be large, and it isn't even copyable in
@@ -32,29 +38,30 @@ public:
     // returning the cached instance on every subsequent call. Throws std::runtime_error if a
     // first-time load fails.
     T& get(const std::string& path) {
-        auto it = cache_.find(path);
-        if (it != cache_.end()) {
-            return *it->second;  // cache HIT — same instance as last time, no reload
-        }
-
-        // cache MISS — load once, then store. unique_ptr means the T lives on the heap at a
-        // STABLE address, so the reference we return stays valid even if the map rehashes later.
-        auto resource = std::make_unique<T>();
-        if (!resource->loadFromFile(path)) {
-            throw std::runtime_error("ResourceManager: failed to load '" + path + "'");
-        }
-        T& ref = *resource;
-        cache_.emplace(path, std::move(resource));
-        return ref;
+        // TODO(stage 25): implement load-on-first-use + caching.
+        //   - cache HIT: if `path` is already in cache_, return a reference to the SAME instance
+        //     (no reload).
+        //   - cache MISS: make_unique<T>(), call resource->loadFromFile(path); on failure throw
+        //     std::runtime_error (and do NOT cache it). On success, store the unique_ptr in cache_
+        //     and return a reference to the owned T. Storing via unique_ptr keeps the T at a STABLE
+        //     heap address, so the reference stays valid even if the map rehashes later.
+        static T placeholder{};  // placeholder so the starter compiles; replace with the real load
+        return placeholder;
     }
 
     bool is_cached(const std::string& path) const {
-        return cache_.find(path) != cache_.end();
+        // TODO(stage 25): return whether `path` is currently in the cache.
+        return false;  // placeholder
     }
 
-    std::size_t size() const { return cache_.size(); }
+    std::size_t size() const {
+        // TODO(stage 25): return how many resources are cached.
+        return 0;  // placeholder
+    }
 
-    void clear() { cache_.clear(); }  // drop everything (the destructors free the resources — RAII)
+    void clear() {
+        // TODO(stage 25): drop every cached resource (the unique_ptr destructors free them — RAII).
+    }
 
 private:
     std::unordered_map<std::string, std::unique_ptr<T>> cache_;

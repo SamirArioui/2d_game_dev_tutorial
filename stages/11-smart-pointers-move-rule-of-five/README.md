@@ -213,8 +213,11 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — `unique_ptr` entities sharing a `shared_ptr` resource
 
-In [`project/src/`](project/src/). It brings the whole stage together on the course's
-`Character`/`Enemy` types:
+**Your task.** The starters in [`project/src/`](project/src/) have `TODO`s — you implement the demo
+in [`main.cpp`](project/src/main.cpp) and the rule-of-5 class in
+[`scoped_resource.cpp`](project/src/scoped_resource.cpp). (`ScopedResource` is declared in
+`scoped_resource.hpp`; the `Character` / `Enemy` / `SpriteStub` types are provided for you in
+`entity.hpp`.) It brings the whole stage together on the course's `Character`/`Enemy` types:
 
 - entities live in a **`std::vector<std::unique_ptr<Character>>`** — the vector exclusively owns each
   one, and `describe()` dispatches virtually (`Character` follows the **rule of 0**: it holds a
@@ -225,7 +228,7 @@ In [`project/src/`](project/src/). It brings the whole stage together on the cou
 - **`ScopedResource`** is a **rule-of-5** class owning a raw handle, with every special member
   **logging**, so copy/move/destroy are observable.
 
-Expected output (abridged):
+Once your implementation is complete it prints (abridged):
 
 ```
 === Shared sprite (shared_ptr) ===
@@ -252,6 +255,14 @@ cmake -S . -B build && cmake --build build
 ./build/stage11_entities
 ```
 
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone and
+compare, but try it yourself first:
+
+```bash
+cmake -S project/solution -B build-solution && cmake --build build-solution
+./build-solution/stage11_entities
+```
+
 This is the ownership model the engine stages build on: the world owns entities via
 `unique_ptr`, and shared assets (textures, fonts, sounds) are handed around as `shared_ptr` — which
 is exactly what the resource manager in stage 25 formalizes.
@@ -265,7 +276,8 @@ is exactly what the resource manager in stage 25 formalizes.
 - [ ] I can read `shared_ptr::use_count()` and predict when the object is finally freed.
 - [ ] I can state the rule of 0/3/5 and know rule-of-0 is the goal (let members manage themselves).
 - [ ] I know a `vector<unique_ptr<Base>>` needs a **virtual destructor** on `Base`, and why.
-- [ ] I built and ran the mini-project and watched the shared count and the rule-of-5 log.
+- [ ] I implemented the mini-project (`project/src/main.cpp` + `scoped_resource.cpp`) and watched the
+      shared count and the rule-of-5 log.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — cppreference on `<memory>`; the
 C++ Core Guidelines section on resource management (R.*) is excellent and short.

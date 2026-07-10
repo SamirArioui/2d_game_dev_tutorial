@@ -217,10 +217,16 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — Combat summary
 
-In [`project/src/main.cpp`](project/src/main.cpp). A hero equips an item and lands a typed attack on
-an enemy; the program prints a formatted combat report. It defines the course's **shared data
-contracts** — reused unchanged by later stages (inventory in 09, save/load in 10, the capstone in
-27):
+**Your task.** [`project/src/main.cpp`](project/src/main.cpp) is a **starter**: the shared data
+contracts and the function signatures are given (keep their shape), and you implement the three
+function bodies and the body of `main()`. A hero equips an item and lands a typed attack on an
+enemy; the program prints a formatted combat report. It **exercises every concept from this
+stage**: two `struct`s (one with a `std::string` member), brace initialization, an `enum class`
+driving a `switch`, and `std::string` building the report. Damage reuses `static_cast` from
+stage 01 (`float` multiplier → whole number).
+
+The starter defines the course's **shared data contracts** — reused unchanged by later stages
+(inventory in 09, save/load in 10, the capstone in 27); **do not change their shape**:
 
 ```cpp
 struct Stats { int hp, attack, defense; };   // three ints, in this order
@@ -229,9 +235,15 @@ enum class DamageType { Physical, Fire, Ice };
 float damage_multiplier(DamageType);          // switch: Physical 1.0, Fire 1.5, Ice 0.75
 ```
 
-It **exercises every concept from this stage**: two `struct`s (one with a `std::string` member),
-brace initialization, an `enum class` driving a `switch`, and `std::string` building the report.
-Damage reuses `static_cast` from stage 01 (`float` multiplier → whole number). Output:
+Build the starter and run it:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o combat
+./combat
+echo $?          # should print 0
+```
+
+What your finished program should print:
 
 ```
 ------------------------------
@@ -252,6 +264,13 @@ The enemy staggers but fights on.
 This closes Phase A: you can now model game data with your own types. [Stage 04](../04-headers-and-multi-file/)
 takes this same data and code and splits it across `.hpp` / `.cpp` files so a program can grow
 beyond one translation unit.
+
+Stuck? A complete reference is in [`project/solution/src/main.cpp`](project/solution/src/main.cpp)
+— try it yourself first, then compare:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/solution/src/main.cpp -o combat
+```
 
 ---
 

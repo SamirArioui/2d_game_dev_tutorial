@@ -248,7 +248,9 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — Inventory (keyed, sorted, filtered)
 
-In [`project/src/`](project/src/). An `Inventory` class that combines **every** concept above:
+**Your task.** [`project/src/inventory.cpp`](project/src/inventory.cpp) is a **starter** with `TODO`s
+— you implement the `Inventory` class declared in
+[`project/src/inventory.hpp`](project/src/inventory.hpp), combining **every** concept above:
 
 - distinct items in a **`std::vector<Item>`** (`struct Item { std::string name; int value; };`),
 - quantities in a **`std::unordered_map<std::string,int>`** keyed by name — the `dict` analog, used
@@ -257,8 +259,9 @@ In [`project/src/`](project/src/). An `Inventory` class that combines **every** 
 - **`matching(pred)`** taking a **stored `std::function<bool(const Item&)>`** so the filter rule is
   data, not hard-coded.
 
-`main.cpp` builds an inventory (note "Arrow" added twice — one entry, climbing count), prints the
-keyed totals, sorts by value, then filters to "items worth ≥ 50". Expected output:
+The demo in `main.cpp` builds an inventory (note "Arrow" added twice — one entry, climbing count),
+prints the keyed totals, sorts by value, then filters to "items worth ≥ 50". Once your
+implementation is complete it prints exactly:
 
 ```
 === Inventory ===
@@ -287,6 +290,14 @@ cmake -S . -B build && cmake --build build
 ./build/stage09_inventory
 ```
 
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone and
+compare, but try it yourself first:
+
+```bash
+cmake -S project/solution -B build-solution && cmake --build build-solution
+./build-solution/stage09_inventory
+```
+
 ---
 
 ## Checklist before moving on
@@ -297,7 +308,8 @@ cmake -S . -B build && cmake --build build
 - [ ] I can iterate a map with `for (const auto& [k, v] : m)` and know `operator[]` inserts on read.
 - [ ] I can sort a container with `std::sort` + a lambda comparator (`a < b` for ascending).
 - [ ] I can write a lambda, capture a variable in its closure, and store one in a `std::function`.
-- [ ] I built and ran the inventory mini-project and saw the keyed/sorted/filtered output.
+- [ ] I implemented the inventory mini-project (`project/src/inventory.cpp`) and it prints the
+      keyed/sorted/filtered output.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — cppreference's container and algorithm
 pages are the canonical reference; skim the "Containers library" overview.

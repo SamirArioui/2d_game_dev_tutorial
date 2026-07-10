@@ -187,8 +187,10 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — Save / load the inventory + stats
 
-In [`project/src/`](project/src/). It persists the **stage-9 inventory** plus a `Stats` block to a
-line-based text file and loads it back, exercising every concept of the stage.
+**Your task.** [`project/src/savegame.cpp`](project/src/savegame.cpp) is a **starter** with `TODO`s
+— you implement `save()` and `load()` (declared in
+[`project/src/savegame.hpp`](project/src/savegame.hpp)) to persist the **stage-9 inventory** plus a
+`Stats` block to a line-based text file and load it back, exercising every concept of the stage.
 
 Shared course contracts used here:
 
@@ -215,8 +217,8 @@ ITEM|Arrow|5|60
 ```
 
 `load()` returns an **empty optional** if the file is missing *or* any line is malformed (wrong
-tag, missing field, non-numeric number) — never a half-filled struct. `main.cpp` proves both the
-round-trip and the empty-optional path. Expected output:
+tag, missing field, non-numeric number) — never a half-filled struct. Once your implementation is
+complete, the demo in `main.cpp` proves both the round-trip and the empty-optional path:
 
 ```
 === Saving ===
@@ -241,6 +243,14 @@ cmake -S . -B build && cmake --build build
 cd build && ./stage10_save_load     # run from build/ so savegame.txt lands there
 ```
 
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone and
+compare, but try it yourself first:
+
+```bash
+cmake -S project/solution -B build-solution && cmake --build build-solution
+cd build-solution && ./stage10_save_load
+```
+
 This `SaveData` + `load()` shape is a **course contract**: the capstone (stage 27) reuses this exact
 save/load design.
 
@@ -253,8 +263,8 @@ save/load design.
 - [ ] I can read a file with `while (std::getline(in, line))` and split a line with `std::stringstream`.
 - [ ] I can name the three error styles and say when each fits.
 - [ ] I know `std::optional<T>` is C++'s `None`, and can use `has_value` / `*` / `value_or`.
-- [ ] My `load()` returns an empty optional on a missing **and** a corrupt file, and I proved the
-      round-trip.
+- [ ] I implemented `save()`/`load()` so `load()` returns an empty optional on a missing **and** a
+      corrupt file, and I proved the round-trip.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — cppreference on `<fstream>`,
 `std::optional`, and `std::stringstream`.

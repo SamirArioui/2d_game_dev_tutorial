@@ -1,5 +1,11 @@
 // ============================================================================
-// Tests for the Inventory (sort-by-value + std::function filter).
+// Tests for the Inventory (sort-by-value + std::function filter).   (YOUR TASK)
+//
+// This is the STARTER. The Inventory type is already complete — YOUR job is to
+// write the assertions. Each case below says what to prove: replace every
+// `// TODO(stage 13): assert ...` with a real REQUIRE(...), then DELETE the
+// `FAIL("implement me")` line so the case can go green. Until you do, `ctest` is
+// RED on purpose. Reference: ../../solution/tests/test_inventory.cpp.
 //
 // Shows a FIXTURE: a struct whose members are the shared setup. Catch2 builds a
 // fresh instance for every TEST_CASE_METHOD, so each test starts from an
@@ -34,43 +40,47 @@ struct InventoryFixture {
 }  // namespace
 
 TEST_CASE_METHOD(InventoryFixture, "add tracks distinct items and counts", "[inventory]") {
-    REQUIRE(inv.distinct_count() == 3);
-    REQUIRE(inv.count_of("Health Potion") == 3);
-    REQUIRE(inv.count_of("Iron Sword") == 1);
-    REQUIRE(inv.count_of("Gold Coin") == 57);
-    // Unknown items are simply absent -> 0, not an error.
-    REQUIRE(inv.count_of("Dragon Egg") == 0);
+    // TODO(stage 13): assert inv.distinct_count() == 3
+    // TODO(stage 13): assert count_of is 3 / 1 / 57 for Health Potion / Iron Sword / Gold Coin
+    // TODO(stage 13): assert an unknown item ("Dragon Egg") has count 0 (absent, not an error)
+
+    FAIL("implement me — write the assertions above, then delete this line");
 }
 
 TEST_CASE_METHOD(InventoryFixture, "adding an existing item stacks its count", "[inventory]") {
     inv.add(Item{"Health Potion", 15}, 2);
-    // Count went up, but it's still ONE distinct item (not a new entry).
-    REQUIRE(inv.count_of("Health Potion") == 5);
-    REQUIRE(inv.distinct_count() == 3);
+    // TODO(stage 13): assert count_of("Health Potion") == 5  (the count stacked)
+    // TODO(stage 13): assert distinct_count() is STILL 3  (no new distinct entry)
+
+    FAIL("implement me — write the assertions above, then delete this line");
 }
 
 TEST_CASE_METHOD(InventoryFixture, "total_value sums value * count", "[inventory]") {
-    // 120*1 + 15*3 + 1*57 = 120 + 45 + 57 = 222.
-    REQUIRE(inv.total_value() == 222);
+    // TODO(stage 13): assert inv.total_value() == 222  (120*1 + 15*3 + 1*57)
+
+    FAIL("implement me — write the assertions above, then delete this line");
 }
 
 TEST_CASE_METHOD(InventoryFixture, "sorted_by_value orders highest value first", "[inventory]") {
     const std::vector<Item> sorted = inv.sorted_by_value();
-    REQUIRE(sorted.size() == 3);
-    REQUIRE(sorted[0].name == "Iron Sword");     // 120
-    REQUIRE(sorted[1].name == "Health Potion");  // 15
-    REQUIRE(sorted[2].name == "Gold Coin");      // 1
-    // Sorting returns a COPY: the inventory's own order is untouched.
-    REQUIRE(inv.items().front().name == "Health Potion");
+    // TODO(stage 13): assert sorted.size() == 3
+    // TODO(stage 13): assert the order by value: sorted[0]=="Iron Sword" (120),
+    //   sorted[1]=="Health Potion" (15), sorted[2]=="Gold Coin" (1)
+    // TODO(stage 13): assert sorting returned a COPY — inv.items().front().name is
+    //   still "Health Potion" (the inventory's own order is untouched)
+
+    FAIL("implement me — write the assertions above, then delete this line");
 }
 
 TEST_CASE_METHOD(InventoryFixture, "filter keeps only matching items", "[inventory]") {
     // The predicate is a lambda passed as a std::function. Python: filter(pred, items).
     const std::vector<Item> valuable =
         inv.filter([](const Item& item) { return item.value >= 15; });
-    REQUIRE(valuable.size() == 2);  // Iron Sword + Health Potion; Gold Coin (1) drops out
+    // TODO(stage 13): assert valuable.size() == 2  (Iron Sword + Health Potion; Gold Coin drops)
 
     // A predicate that matches nothing yields an empty result (not an error).
     const std::vector<Item> none = inv.filter([](const Item&) { return false; });
-    REQUIRE(none.empty());
+    // TODO(stage 13): assert none.empty()
+
+    FAIL("implement me — write the assertions above, then delete this line");
 }

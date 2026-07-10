@@ -1,21 +1,22 @@
+// YOUR TASK — implement the BattleLog methods declared in battle_log.hpp.
+// A complete reference is in ../solution/src/battle_log.cpp.
 #include "battle_log.hpp"
 
 #include <iostream>
 #include <utility>   // std::move
 
+// The member-initializer list (title_) is given; you fill in the ACQUIRE step in the body.
 BattleLog::BattleLog(std::string title) : title_(std::move(title)) {
-    // ACQUIRE: announce that the log is open. In a real engine this might open a file (stage 10)
-    // or a network connection — the pattern is identical.
-    std::cout << "=== " << title_ << " ===\n";
+    // TODO(stage 07): ACQUIRE the resource — announce the log is open by printing an opening
+    // banner "=== <title_> ===\n". (In a real engine this might instead open a file.)
 }
 
 BattleLog::~BattleLog() {
-    // RELEASE: this is the "real cleanup" that proves RAII is more than a slogan. It runs
-    // automatically when the BattleLog goes out of scope — nothing in main() calls it by hand.
-    std::cout << "=== " << title_ << " closed (" << entries_ << " entries logged) ===\n";
+    // TODO(stage 07): RELEASE the resource — this is the RAII payload. Print the closing summary
+    // "=== <title_> closed (<entries_> entries logged) ===\n". Nothing calls this by hand: it
+    // runs automatically when the BattleLog leaves scope, which is the whole point of RAII.
 }
 
 void BattleLog::record(const std::string& line) {
-    ++entries_;
-    std::cout << "  " << line << "\n";
+    // TODO(stage 07): increment entries_ and print "  <line>\n".
 }

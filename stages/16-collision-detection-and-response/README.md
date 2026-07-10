@@ -209,11 +209,17 @@ Try each yourself before peeking at the `.solution.cpp`.
 
 ## Mini-project — Balls & rectangles bouncing in a box
 
-In [`project/`](project/). A handful of circles and AABBs drift around the window;
-each frame they move, bounce off the four container walls, and are tested pairwise
-with the right predicate (`circle_vs_circle`, `aabb_vs_aabb`, `circle_vs_aabb`).
-On a hit they're separated by the penetration vector and both velocities bounce
-with restitution. It exercises **all** of the stage:
+**Your task.** In [`project/`](project/). The SFML scaffolding — the window, the event loop, the
+per-frame move/wall-bounce/pairwise-resolve glue and all the drawing in
+[`src/main.cpp`](project/src/main.cpp) — is complete. What's missing is the **collision maths** in
+[`include/collision.hpp`](project/include/collision.hpp): the four predicates `aabb_vs_aabb`,
+`circle_vs_circle`, `circle_vs_aabb` and `reflect_velocity` ship as `// TODO(stage 16)` stubs, so
+the app builds and links but nothing collides and [`tests/test_collision.cpp`](project/tests/test_collision.cpp)
+starts **RED**. Implement each function (the header comments walk through the maths) and drive the
+suite green. A handful of circles and AABBs then drift around the window; each frame they move,
+bounce off the four container walls, and are tested pairwise with the right predicate. On a hit
+they're separated by the penetration vector and both velocities bounce with restitution. It
+exercises **all** of the stage:
 
 - all three detectors, dispatched by shape pair,
 - the penetration vector driving **positional correction**,
@@ -223,6 +229,22 @@ with restitution. It exercises **all** of the stage:
 Every predicate and the response math is covered by the Catch2 suite you can run
 headless here. The window itself is *unverified-by-execution* in this course's
 build box (no display) but compiles and links against SFML.
+
+```bash
+cd project
+cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build build
+ctest --test-dir build --output-on-failure    # RED until you implement collision.hpp, then GREEN
+```
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — try it yourself first,
+then compare. It's a self-contained project you build on its own:
+
+```bash
+cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # GREEN
+```
 
 > **Feeds stage 18:** the AABB-vs-AABB and reflect-with-restitution pieces are
 > literally Pong's ball-vs-paddle and ball-vs-wall — you'll reuse this tested code
@@ -243,8 +265,9 @@ build box (no display) but compiles and links against SFML.
       with **restitution**, only when moving into the surface.
 - [ ] I know **SAT** is the rotated-shape generalisation and that broad-phase
       structures exist — both are out of scope here.
-- [ ] I kept every predicate and the response **pure and unit-tested**, separate
-      from the window.
+- [ ] I implemented the mini-project's `collision.hpp` (`aabb_vs_aabb`, `circle_vs_circle`,
+      `circle_vs_aabb`, `reflect_velocity`) — pure and separate from the window — and drove
+      `test_collision.cpp` from red to green.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — Randy Gallegos /
 "N Tutorial" on AABB & SAT, Real-Time Collision Detection (Ericson) for the

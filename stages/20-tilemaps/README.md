@@ -136,18 +136,25 @@ this corner check; the mini-project uses it.)
 ## 5. Building and running
 
 The mini-project lives in [`project/`](project/) with three CMake targets: the pure `tilemap_core`
-library, the SFML `tilemap_demo` app, and the Catch2 `tilemap_tests` runner.
+library, the SFML `tilemap_demo` app, and the Catch2 `tilemap_tests` runner. It ships as a
+**starter**: the SFML renderer, the window, and the headers are complete, but the pure `Tilemap`
+methods in [`project/src/tilemap.cpp`](project/src/tilemap.cpp) are left for you to write, so out of
+the box the parser tests are **RED**. You make them green.
 
 ```bash
 cd project
 cmake -S . -B build          # first run clones SFML 2.6.1 + Catch2 v3.7.1 (needs network)
 cmake --build build
 
-ctest --test-dir build --output-on-failure   # the parser tests -> 100% passed
+ctest --test-dir build --output-on-failure   # RED until you implement src/tilemap.cpp
 ./build/tilemap_demo         # the window (run from project/ so it finds assets/level1.map)
 ```
 
 Move with **WASD** or the **arrow keys**; you slide along walls and can't pass through solid tiles.
+
+The complete, all-green reference is in [`project/solution/`](project/solution/) — build it the same
+way (`cmake -S project/solution -B project/solution/build && cmake --build project/solution/build`)
+to see `100% tests passed`.
 
 > **Sandbox / offline note:** the first `cmake` reaches `github.com` to clone SFML and Catch2. After
 > that they're cached under `build/_deps` and later builds are offline. If your machine sandboxes
@@ -204,9 +211,9 @@ Each program asserts its own results and prints `all checks passed`.
 
 ---
 
-## Mini-project — render and walk a tile level
+## Your task — render and walk a tile level
 
-In [`project/`](project/). It **combines every concept of the stage**:
+In [`project/`](project/). The mini-project **combines every concept of the stage**:
 
 - **loads** `assets/level1.map` (a 20×15, 32px level) with `Tilemap::from_file`, falling back to an
   embedded map so it runs from anywhere;
@@ -215,15 +222,28 @@ In [`project/`](project/). It **combines every concept of the stage**:
   resolution so it slides along walls;
 - ships a **Catch2 test suite** for the parser, run by `ctest`.
 
-The window itself is *unverified-by-execution* on the build machine (no display) — the bar is that
-it **builds and links**, while the map *logic* it depends on is proven by the tests.
+**What you implement.** Everything above is wired up *except* the pure map logic — the four
+`Tilemap` methods in [`project/src/tilemap.cpp`](project/src/tilemap.cpp) (`from_text`, `from_file`,
+`tile_at`, `solid_at`) ship as `// TODO(stage 20)` stubs with placeholder returns. The starter
+compiles and links, but the parser tests in
+[`project/tests/test_tilemap.cpp`](project/tests/test_tilemap.cpp) are **RED** until you fill them
+in. The contract for each method is in
+[`project/include/game/tilemap.hpp`](project/include/game/tilemap.hpp). Implement them, run `ctest`,
+and drive it to green — the SFML renderer and window are already done for you (that half is
+*unverified-by-execution* on the build machine anyway; the bar is that it **builds and links**,
+while the map *logic* you write is proven by the tests).
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
+(`cmake -S project/solution -B project/solution/build`) to compare.
 
 ---
 
 ## Checklist before moving on
 
+- [ ] I implemented the pure `Tilemap` methods (`from_text`/`from_file`/`tile_at`/`solid_at`) and
+      drove the parser tests from RED to green.
 - [ ] I can explain a tilemap as a typed, flat-stored 2D list of ints, and index it `y*width + x`.
-- [ ] I loaded a map from the text format `W H tileSize` + rows, and know what makes one malformed.
+- [ ] I parsed the text format `W H tileSize` + rows, and know what makes one malformed (and throws).
 - [ ] I understand why one `sf::VertexArray` beats one sprite per tile.
 - [ ] I generated the tileset procedurally with `sf::Image` (no asset files).
 - [ ] I did tile collision by converting a world point to a cell and resolving X and Y separately.

@@ -4,5 +4,7 @@
 #include <iostream>
 
 void print_player(const Player& player) {
-    std::cout << "  " << player.name << " (hp " << player.hp << ")\n";
+    // TODO(stage 04): print one indented line "  <name> (hp <hp>)\n" to std::cout,
+    // reading player.name and player.hp from the shared struct.
+    (void)player;
 }

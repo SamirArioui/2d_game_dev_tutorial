@@ -249,9 +249,14 @@ Try each yourself before peeking at the `.solution.cpp`.
 
 ## Mini-project — Bouncing ball under a fixed-timestep accumulator
 
-In [`project/`](project/). A constant-velocity ball reflects off the window edges, driven by the
-full **fixed-timestep accumulator with render interpolation**, and a `Space` key **toggles to a
-variable timestep** so you can feel the difference. It combines every concept in the stage:
+**Your task.** In [`project/`](project/). The SFML scaffolding is done for you — the window, the
+event loop, the update/render split, the `Space` toggle and all the drawing in
+[`src/main.cpp`](project/src/main.cpp) are complete. What's missing is the **pure simulation logic**
+in [`include/sim.hpp`](project/include/sim.hpp): `integrate`, `reflect_in_bounds`, `steps_to_run`,
+`clamp_frame_dt` and `render_lerp` ship as `// TODO(stage 14)` stubs, so the app builds and links
+but the ball won't move and [`tests/test_sim.cpp`](project/tests/test_sim.cpp) starts **RED**.
+Implement each function (the header comments give the maths) and drive the suite to green. It
+combines every concept in the stage:
 
 - a `RenderWindow` + event loop with the **update/render** split,
 - **delta time** from `sf::Clock`, clamped against stalls,
@@ -262,6 +267,22 @@ variable timestep** so you can feel the difference. It combines every concept in
 All motion/timestep math is in the window-free `sim.hpp` and covered by the Catch2 suite, which you
 can run headless here. The window itself is *unverified-by-execution* in this course's build box
 (no display), but it compiles and links against SFML.
+
+```bash
+cd project
+cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build build
+ctest --test-dir build --output-on-failure    # RED until you implement sim.hpp, then GREEN
+```
+
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — try it yourself first,
+then compare. It's a self-contained project you build on its own:
+
+```bash
+cmake -S project/solution -B project/solution/build -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # GREEN
+```
 
 > **Deferred on purpose:** the ball moves at constant velocity and only *reflects* off walls. Real
 > acceleration and **gravity** arrive in **stage 15**; real overlap/penetration **collision** and
@@ -278,7 +299,8 @@ can run headless here. The window itself is *unverified-by-execution* in this co
 - [ ] I move things by `speed * dt` and can say why per-frame constants are a bug.
 - [ ] I can describe a **variable** vs a **fixed** timestep, implement the **accumulator**, and
       explain the **spiral of death** and why `max_steps` prevents it.
-- [ ] I kept the motion/timestep logic in a **window-free** header and unit-tested it.
+- [ ] I implemented the mini-project's window-free `sim.hpp` (`integrate`, `reflect_in_bounds`,
+      `steps_to_run`, `clamp_frame_dt`, `render_lerp`) and drove `test_sim.cpp` from red to green.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — the SFML tutorials, and Glenn
 Fiedler's *"Fix Your Timestep!"* (the canonical accumulator article this stage is built on).

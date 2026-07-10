@@ -299,15 +299,28 @@ Try each yourself before peeking at the solution.
 
 ## Mini-project — Dice-roll battle simulator
 
-In [`project/src/main.cpp`](project/src/main.cpp). A lone hero runs a gauntlet against a fixed
-`std::array` of enemies. Each enemy swings once; a d20 roll decides how it lands (`switch`: a `1`
-fumbles, a `20` is a critical, everything else is a normal hit), damage is a `float`-scaled roll
-made whole with `static_cast`, and the hero fights until the roster is cleared or HP hits zero.
+**Your task.** [`project/src/main.cpp`](project/src/main.cpp) is a **starter** with `TODO`s — you
+implement it, **combining every concept from this stage**: the numeric types, `const` tuning
+values, `static_cast` for the damage, a `std::array` roster walked by range-`for` (and a classic
+`for` for the preview), `auto` to bind each roll, `if` for HP checks, `switch` for the outcome, and
+`<random>` for the rolls.
 
-It **combines every concept from this stage**: the numeric types, `const` tuning values,
-`static_cast` for the damage, a `std::array` roster walked by range-`for` (and a classic `for` for
-the preview), `auto` to bind each roll, `if` for HP checks, `switch` for the outcome, and
-`<random>` for the rolls. The seed is fixed (`121`) so your output matches this:
+A lone hero runs a gauntlet against a fixed `std::array` of enemies. Each enemy swings once; a d20
+roll decides how it lands (`switch`: a `1` fumbles, a `20` is a critical, everything else is a
+normal hit), damage is a `float`-scaled roll made whole with `static_cast`, and the hero fights
+until the roster is cleared or HP hits zero. The setup, roster preview and summary are given as
+scaffolding — you fill in the two `TODO`s inside the fight loop (the swing `switch` and the HP
+`if`/`else`).
+
+Build the starter and run it:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o battle
+./battle
+echo $?          # should print 0
+```
+
+The seed is fixed (`121`), so what your finished program should print is exactly:
 
 ```
 == The gauntlet ==
@@ -334,6 +347,13 @@ The hero cleared the gauntlet with 8 HP to spare!
 Change the seed to `std::random_device{}()` and the fight plays out differently every run. This
 dice battle is the second link in the course's throughline (character sheet → **dice battle** →
 game-math lib → …).
+
+Stuck? A complete reference is in [`project/solution/src/main.cpp`](project/solution/src/main.cpp)
+— try it yourself first, then compare:
+
+```bash
+clang++ -std=c++17 -Wall -Wextra project/solution/src/main.cpp -o battle
+```
 
 ---
 

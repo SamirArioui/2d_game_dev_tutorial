@@ -204,7 +204,7 @@ cd project
 # --- Fast path: build & run ONLY the tests (no SFML, no display needed) ---
 cmake -S . -B build -DBUILD_APP=OFF
 cmake --build build
-ctest --test-dir build --output-on-failure        # 5 tests, all green
+ctest --test-dir build --output-on-failure        # 5 tests — RED until you implement the TODOs
 
 # --- Full path: also build the SFML demo (first run clones SFML) ---
 cmake -S . -B build
@@ -248,28 +248,45 @@ is the reference. Ordered easy → hard.
 
 ---
 
-## Mini-project — Pong as entities + components + systems
+## Your task — Pong as entities + components + systems
 
-In [`project/`](project/). The same Pong you'd build with classes, rebuilt the component way:
+**Your task.** [`project/`](project/) is a **starter**: the component `struct`s, the `Entity` class
+*signatures*, the demo in [`main.cpp`](project/src/main.cpp) and the tests are all given, but the
+bodies you implement are stubbed with `TODO`s and placeholder returns:
 
-- two paddles and a ball are plain `ecs::Entity` objects (see `make_paddle` / `make_ball` in
-  [`main.cpp`](project/src/main.cpp));
-- each carries `Transform` / `Velocity` / `Shape` components;
-- `movement_system`, `bounce_in_bounds`, and `aabb_overlap` (in
-  [`systems.cpp`](project/src/systems.cpp)) drive them — the exact functions the tests exercise.
+- **`Entity`** — the typed component bag (`add`/`has`/`get`/`try_get`/`remove`/`component_count`) in
+  [`include/ecs/entity.hpp`](project/include/ecs/entity.hpp);
+- **the systems** — `movement_system`, `bounce_in_bounds`, and `aabb_overlap` in
+  [`systems.cpp`](project/src/systems.cpp) — the exact functions the tests exercise.
+
+The starter compiles and links, but `ctest` is **RED** until you fill in the `TODO`s. Work
+test-by-test in [`tests/test_ecs.cpp`](project/tests/test_ecs.cpp) until it's green. When done, the
+same Pong falls out the component way: two paddles and a ball are plain `ecs::Entity` objects (see
+`make_paddle` / `make_ball`), each carrying `Transform` / `Velocity` / `Shape` components. The
+paddles have no `Velocity`, so the movement system ignores them; the ball has all three, so it
+moves, bounces off the walls, and reverses off a paddle on overlap.
 
 It **combines every concept in the stage**: plain-data components, a typed entity bag, systems with
-queries, and the logic/rendering split. The paddles have no `Velocity`, so the movement system
-ignores them; the ball has all three components, so it moves, bounces off the walls, and reverses
-off a paddle on overlap. Input handling is intentionally minimal here — mapped, semantic input is
-the whole point of **stage 24**.
+queries, and the logic/rendering split. Input handling is intentionally minimal here — mapped,
+semantic input is the whole point of **stage 24**.
 
-Build + link is verified; the on-screen behaviour is unverified-by-execution (CI has no display).
+Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
+(it has its own `CMakeLists.txt`) and compare:
+
+```bash
+cmake -S project/solution -B project/solution/build -DBUILD_APP=OFF
+cmake --build project/solution/build
+ctest --test-dir project/solution/build --output-on-failure   # all green
+```
+
+Build + link of your version is verified; the on-screen behaviour is unverified-by-execution (CI
+has no display).
 
 ---
 
 ## Checklist before moving on
 
+- [ ] I implemented the mini-project starter (`Entity` + the three systems) so `ctest` is green.
 - [ ] I can explain why deep inheritance trees get painful for game objects.
 - [ ] I can state the three parts of the model: component (data), entity (typed bag), system
       (function with a query).
