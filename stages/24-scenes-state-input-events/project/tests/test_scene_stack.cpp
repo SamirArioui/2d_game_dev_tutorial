@@ -59,3 +59,47 @@ TEST_CASE("push/pop/top behave like a stack", "[scene]") {
     stack.pop();
     REQUIRE(stack.empty());
 }
+
+namespace {
+
+// A scene that pops ITSELF from inside its own update(). If the stack destroyed it immediately,
+// the rest of update() would run on a deleted object (use-after-free — ASan would report it).
+struct SelfPoppingScene : scene::Scene {
+    scene::SceneStack& stack;
+    int updates = 0;
+    explicit SelfPoppingScene(scene::SceneStack& s) : stack(s) {}
+
+    void update(float /*dt*/) override {
+        stack.pop();  // request: only QUEUED, because the stack is busy calling us
+        ++updates;    // still safe: `this` is alive until update() has returned
+    }
+    void render(sf::RenderTarget& /*target*/) override {}
+    void handle_input(const sf::Event& /*event*/) override {}
+};
+
+}  // namespace
+
+TEST_CASE("a scene can safely pop itself during update", "[scene]") {
+    scene::SceneStack stack;
+    int base_updates = 0;
+    stack.push(std::make_unique<MockScene>(&base_updates));
+    stack.push(std::make_unique<SelfPoppingScene>(stack));
+    REQUIRE(stack.size() == 2);
+
+    stack.update(0.016f);  // the self-pop is applied AFTER update() returns
+    REQUIRE(stack.size() == 1);
+    REQUIRE(base_updates == 0);
+
+    stack.update(0.016f);  // the scene underneath is active again
+    REQUIRE(base_updates == 1);
+}
+
+TEST_CASE("push and pop outside a scene call take effect immediately", "[scene]") {
+    scene::SceneStack stack;
+    int updates = 0;
+    stack.push(std::make_unique<MockScene>(&updates));
+    REQUIRE(stack.size() == 1);  // not queued: nobody was mid-call
+    stack.pop();
+    REQUIRE(stack.empty());
+    REQUIRE_NOTHROW(stack.pop());  // popping an empty stack is a no-op
+}

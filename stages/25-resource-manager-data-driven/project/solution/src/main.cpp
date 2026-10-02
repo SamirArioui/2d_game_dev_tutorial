@@ -16,7 +16,7 @@
 // magenta "missing texture" placeholder instead of crashing, so a typo in the data file is
 // obvious on screen rather than fatal.
 //
-// Verified to BUILD and LINK. Run it from THIS folder (so "assets/..." resolves):
+// Run it from THIS folder (so "assets/..." resolves):
 //   cmake -S . -B build && cmake --build build
 //   ./build/resource_demo
 // ============================================================================

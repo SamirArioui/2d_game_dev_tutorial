@@ -14,7 +14,7 @@
 //
 // TODO:
 //   1. Define struct Stats, enum class DamageType, and float damage_multiplier(DamageType)
-//      using a switch (with a default of 1.0f).
+//      using a switch (no `default:`; return 1.0f after the switch as a fallback).
 //   2. In main, make an attacker Stats{0, 14, 0} and a defender Stats{40, 0, 6} (brace init).
 //   3. For a Fire attack: compute raw = attack - defense, clamp it to >= 0, multiply by the
 //      Fire multiplier, static_cast to int -> final damage.

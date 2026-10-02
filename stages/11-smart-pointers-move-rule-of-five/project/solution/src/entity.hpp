@@ -10,10 +10,12 @@
 // SpriteStub stands in for a real texture/sprite (we're not on SFML yet). The
 // point is the ownership graph, not the pixels.
 //
-// Character follows the RULE OF 0: it owns nothing raw — just a std::string, ints,
-// and a std::shared_ptr, all of which manage themselves — so it declares NONE of
-// the special members. (Contrast ScopedResource, which owns a raw handle and needs
-// the full rule of 5.)
+// Character's members follow the RULE OF 0: it owns nothing raw — just a std::string,
+// ints, and a std::shared_ptr, all of which manage themselves. Its ONLY special member
+// is the virtual destructor a polymorphic base needs. Declaring it suppresses the
+// implicit move operations (copies still work); that's fine because entities are only
+// ever moved as unique_ptr<Character>, never as Character objects. (Contrast
+// ScopedResource, which owns a raw handle and needs the full rule of 5.)
 // ============================================================================
 #pragma once
 

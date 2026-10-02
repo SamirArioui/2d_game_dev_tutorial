@@ -31,7 +31,8 @@ void Application::run() {
         const float dt = clock.restart().asSeconds();
         scenes_.update(dt);
 
-        // A scene can pop itself (e.g. "quit" from a menu); if nothing is left
+        // A scene can pop itself (e.g. "quit" from a menu: `stack()->pop()`).
+        // The stack applied that AFTER update() returned; if nothing is left
         // there is nothing to draw, so we shut down cleanly.
         if (scenes_.empty()) {
             window_.close();

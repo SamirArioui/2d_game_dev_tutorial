@@ -16,9 +16,8 @@
 // after it) exactly like texture-before-sprite. Get this wrong and you hear
 // silence or garbage, or crash on shutdown.
 //
-// VERIFICATION: built headless, this is checked to COMPILE + LINK against SFML
-// (graphics/window/system/audio). Window/audio behavior is not run here; the
-// game LOGIC is fully covered by ctest (tests/test_pong, tests/test_collision).
+// TESTING: ctest never opens the window or plays sound, so play the game to
+// check those. The game LOGIC is fully covered by ctest (tests/test_pong, tests/test_collision).
 // ============================================================================
 
 #include <SFML/Audio.hpp>

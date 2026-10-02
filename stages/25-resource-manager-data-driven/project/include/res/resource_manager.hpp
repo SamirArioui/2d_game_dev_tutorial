@@ -44,7 +44,7 @@ public:
         //   - cache MISS: make_unique<T>(), call resource->loadFromFile(path); on failure throw
         //     std::runtime_error (and do NOT cache it). On success, store the unique_ptr in cache_
         //     and return a reference to the owned T. Storing via unique_ptr keeps the T at a STABLE
-        //     heap address, so the reference stays valid even if the map rehashes later.
+        //     heap address of its own, so the reference stays valid whatever container we use.
         static T placeholder{};  // placeholder so the starter compiles; replace with the real load
         return placeholder;
     }

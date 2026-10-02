@@ -46,3 +46,19 @@ target_link_libraries(engine PUBLIC
     sfml-system
     sfml-audio
 )
+
+# --- The engine's own unit tests ---------------------------------------------
+# Only built when the parent project has fetched Catch2 (every stage project
+# does). Like the game tests, they link Catch2 alone — no SFML: they cover the
+# PURE core (scene stack, resource manager), which is header-only.
+if(TARGET Catch2::Catch2WithMain)
+    enable_testing()
+    add_executable(engine_tests tests/test_engine_core.cpp)
+    target_include_directories(engine_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_compile_features(engine_tests PRIVATE cxx_std_17)
+    target_link_libraries(engine_tests PRIVATE Catch2::Catch2WithMain)
+
+    list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+    include(Catch)
+    catch_discover_tests(engine_tests)
+endif()

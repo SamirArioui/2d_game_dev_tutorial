@@ -43,7 +43,9 @@ constexpr float FixedDt = 1.0f / 120.0f;
 constexpr int MaxSteps = 8;
 
 // Never trust a frame longer than this (a stall shouldn't teleport the ball).
-constexpr float MaxFrameDt = 0.25f;
+// Derived from the step cap: anything longer than MaxSteps slices could never
+// be simulated anyway, so there's no point banking it.
+constexpr float MaxFrameDt = MaxSteps * FixedDt;
 
 }  // namespace
 
@@ -112,7 +114,8 @@ int main() {
             // Leftover time we haven't simulated yet, as a fraction of a step.
             // Drawing at lerp(previous, ball, alpha) hides the mismatch between
             // a 120 Hz sim and a 60 Hz screen — no visible stutter.
-            alpha = accumulator / FixedDt;
+            // Clamped to [0, 1] so we only ever blend, never extrapolate.
+            alpha = sim::interpolation_alpha(accumulator, FixedDt);
         } else {
             // VARIABLE: feed the raw frame time straight in. Simpler, but the
             // result now depends on frame rate, and a big dt can skip through a

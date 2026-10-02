@@ -7,7 +7,8 @@
 //   2. bounce each off the four container WALLS,
 //   3. test every PAIR with the right predicate (circle/circle, aabb/aabb,
 //      circle/aabb), and when they overlap, SEPARATE them (positional
-//      correction by the penetration vector) and BOUNCE both velocities.
+//      correction by the penetration vector) and BOUNCE them with one shared
+//      impulse (so momentum is conserved between the two).
 //
 // Detection and response are the tested, window-free functions in collision.hpp
 // (see project/tests/). This file is only the glue + drawing. The AABB-vs-AABB
@@ -89,16 +90,16 @@ void bounce_off_walls(Entity& e, float w, float h) {
     }
 }
 
-// Resolve a collision between two equal-"mass" entities: split them apart along
-// the penetration vector and reflect each velocity about the contact normal.
-// (A physically exact two-body response would weigh this by mass and use a
-// single shared impulse — see the README's further-reading note.)
+// Resolve a collision between two equal-mass entities: split them apart along
+// the penetration vector, then exchange ONE impulse along the contact normal
+// (collide::resolve_impulse). Reflecting each body's own velocity instead would
+// look plausible but is wrong — a ball hitting a resting ball would bounce back
+// while the other never moves. Inverse mass 1 for both = equal masses.
 void resolve_pair(Entity& a, Entity& b, const collide::Hit& hit) {
     const gmath::Vec2f normal = gmath::normalize(hit.penetration);  // B -> A
     a.pos = a.pos + hit.penetration * 0.5f;   // push A out halfway ...
     b.pos = b.pos - hit.penetration * 0.5f;   // ... and B the other half
-    a.vel = collide::reflect_velocity(a.vel, normal, Restitution);
-    b.vel = collide::reflect_velocity(b.vel, normal * -1.0f, Restitution);
+    collide::resolve_impulse(a.vel, b.vel, 1.0f, 1.0f, normal, Restitution);
 }
 
 }  // namespace

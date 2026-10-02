@@ -36,16 +36,18 @@ public:
     }
 
     // (2) Copy constructor — DEEP copy: allocate our own buffer.
-    Resource(const Resource& other) : id_(next_id_++), data_(new int(*other.data_)) {
-        log("copy ctor");
+    Resource(const Resource& other) : id_(next_id_++), data_(other.data_ ? new int(*other.data_) : nullptr) {
+        log("copy ctor");  // a moved-from `other` (data_ == nullptr) copies as empty
     }
 
-    // (3) Copy assignment — release what we hold, then deep-copy the other.
+    // (3) Copy assignment — deep-copy the other into a NEW buffer first, THEN release
+    // ours. If `new` throws, *this is untouched (deleting first would leave data_
+    // dangling and the destructor would free it twice). This order also makes
+    // x = x safe without a special check.
     Resource& operator=(const Resource& other) {
-        if (this != &other) {  // guard against  x = x;
-            delete data_;
-            data_ = new int(*other.data_);
-        }
+        int* fresh = other.data_ ? new int(*other.data_) : nullptr;
+        delete data_;
+        data_ = fresh;
         log("copy assign");
         return *this;
     }

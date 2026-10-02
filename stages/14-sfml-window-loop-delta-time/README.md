@@ -174,8 +174,11 @@ Two safeties matter:
 
 - **Cap the steps per frame** (`max_steps`). If the game stalls for a full second, the loop would
   otherwise demand 120 catch-up updates at once, making the *next* frame even slower — a runaway
-  called the **spiral of death**. Capping the count breaks the spiral.
-- **Clamp `dt`** before banking it, so one monstrous frame can't flood the accumulator.
+  called the **spiral of death**. Capping the count breaks the spiral. When the cap is hit with
+  whole slices still banked, **drop that backlog** (reset the accumulator): the game briefly runs
+  slower than real time instead of carrying a debt into every following frame.
+- **Clamp `dt`** before banking it, so one monstrous frame can't flood the accumulator. Pick the
+  clamp so it can't exceed what the cap can simulate: `MAX_FRAME_DT <= max_steps * FIXED_DT`.
 
 ### Render interpolation
 
@@ -187,10 +190,16 @@ draw **between** the last two states, blended by `alpha = accumulator / FIXED_DT
 draw_pos = lerp(previous_state, current_state, alpha);
 ```
 
+`alpha` must stay in **[0, 1]**: 0 draws the previous state, 1 the current one. Anything above 1
+*extrapolates* past the newest state — with the backlog bug above, a hitch can push `alpha` to 20+
+and fling the ball off-screen for a frame. Clamp it (`interpolation_alpha` in `sim.hpp`) as a last
+line of defence, even when the accumulator is already kept below one slice.
+
 (We hand-roll a tiny `lerp` here; stage 15 promotes it to the shared `gmath` library.)
 
 All of this timestep math is pure arithmetic, so it lives in [`project/include/sim.hpp`](project/include/sim.hpp)
-as free functions (`steps_to_run`, `clamp_frame_dt`, `integrate`, `reflect_in_bounds`) and is
+as free functions (`steps_to_run`, `clamp_frame_dt`, `interpolation_alpha`, `integrate`,
+`reflect_in_bounds`) and is
 unit-tested in [`project/tests/test_sim.cpp`](project/tests/test_sim.cpp) with **no window at all**.
 
 ---
@@ -239,7 +248,7 @@ ctest --test-dir build --output-on-failure   # test drills: the solutions pass
 3. **`03_frame_rate_independent`** *(medium)* — move a box with `speed * dt` instead of a per-frame
    constant, and wrap it around the screen.
 4. **`04_fixed_accumulator`** *(medium-hard, test)* — implement `steps_to_run`: bank time, spend it
-   in whole slices, cap the count. The heart of the fixed timestep.
+   in whole slices, cap the count and drop the backlog. The heart of the fixed timestep.
 5. **`05_reflect_edges`** *(medium, test)* — implement the per-axis edge bounce (snap in, reverse
    velocity) and prove it with tests.
 
@@ -253,7 +262,7 @@ Try each yourself before peeking at the `.solution.cpp`.
 event loop, the update/render split, the `Space` toggle and all the drawing in
 [`src/main.cpp`](project/src/main.cpp) are complete. What's missing is the **pure simulation logic**
 in [`include/sim.hpp`](project/include/sim.hpp): `integrate`, `reflect_in_bounds`, `steps_to_run`,
-`clamp_frame_dt` and `render_lerp` ship as `// TODO(stage 14)` stubs, so the app builds and links
+`clamp_frame_dt`, `interpolation_alpha` and `render_lerp` ship as `// TODO(stage 14)` stubs, so the app builds and links
 but the ball won't move and [`tests/test_sim.cpp`](project/tests/test_sim.cpp) starts **RED**.
 Implement each function (the header comments give the maths) and drive the suite to green. It
 combines every concept in the stage:
@@ -264,9 +273,8 @@ combines every concept in the stage:
 - **render interpolation** (`render_lerp`) so a 60 Hz screen shows smooth motion,
 - SFML's **y-down** coordinate system (the ball starts moving down-right).
 
-All motion/timestep math is in the window-free `sim.hpp` and covered by the Catch2 suite, which you
-can run headless here. The window itself is *unverified-by-execution* in this course's build box
-(no display), but it compiles and links against SFML.
+All motion/timestep math is in the window-free `sim.hpp` and covered by the Catch2 suite, which runs
+without opening a window. Run the app to check the window itself.
 
 ```bash
 cd project
@@ -300,7 +308,8 @@ ctest --test-dir project/solution/build --output-on-failure   # GREEN
 - [ ] I can describe a **variable** vs a **fixed** timestep, implement the **accumulator**, and
       explain the **spiral of death** and why `max_steps` prevents it.
 - [ ] I implemented the mini-project's window-free `sim.hpp` (`integrate`, `reflect_in_bounds`,
-      `steps_to_run`, `clamp_frame_dt`, `render_lerp`) and drove `test_sim.cpp` from red to green.
+      `steps_to_run`, `clamp_frame_dt`, `interpolation_alpha`, `render_lerp`) and drove
+      `test_sim.cpp` from red to green.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — the SFML tutorials, and Glenn
 Fiedler's *"Fix Your Timestep!"* (the canonical accumulator article this stage is built on).

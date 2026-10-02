@@ -12,8 +12,8 @@
 // parallax offset are all in the PURE, unit-tested game::camera functions. This
 // file is the SFML glue: it owns the sf::View and does the drawing.
 //
-// NOTE: the bar for this stage is BUILD + LINK. The build machine has no
-// display, so the on-screen result is unverified-by-execution.
+// NOTE: ctest never opens this window. The camera maths is unit-tested; check
+// the on-screen result by running the demo.
 // ============================================================================
 
 #include <SFML/Graphics.hpp>

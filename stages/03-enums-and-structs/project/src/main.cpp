@@ -57,17 +57,17 @@ enum class DamageType { Physical, Fire, Ice };
 
 // Human-readable name for a damage type (used when building the report string).
 std::string type_name(DamageType type) {
-    // TODO(stage 03): switch over `type` and return "Physical" / "Fire" / "Ice"
-    // (with a default of "Unknown").
+    // TODO(stage 03): switch over `type` and return "Physical" / "Fire" / "Ice".
+    // List every enumerator and leave out `default:` (see README section 4).
     return "Unknown";
 }
 
 // The damage-type table: how much each type scales the raw hit. A switch over the enum is
-// the idiomatic way to express "one value per case". The default protects us if the enum
-// ever gains a case we forget to handle here.
+// the idiomatic way to express "one value per case". There is deliberately NO `default:`,
+// so if the enum ever gains a case we forget to handle here, -Wswitch warns about it.
 float damage_multiplier(DamageType type) {
     // TODO(stage 03): switch over `type`: Physical -> 1.0f, Fire -> 1.5f, Ice -> 0.75f
-    // (default -> 1.0f).
+    // (no `default:`; keep a fallback return after the switch).
     return 1.0f;
 }
 

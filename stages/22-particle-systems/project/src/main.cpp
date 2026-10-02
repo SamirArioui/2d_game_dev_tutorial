@@ -7,8 +7,8 @@
 // with the keyboard, calls the emitters, updates the pool, and draws it in one
 // vertex-array pass. A single fixed-capacity pool feeds BOTH effects.
 //
-// NOTE: the bar for this stage is BUILD + LINK. No display on the build
-// machine, so the visuals are unverified-by-execution.
+// NOTE: ctest never opens this window. The pool logic is unit-tested; check
+// the visuals by running the demo.
 // ============================================================================
 
 #include <SFML/Graphics.hpp>

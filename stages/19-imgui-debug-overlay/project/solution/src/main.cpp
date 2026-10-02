@@ -17,9 +17,8 @@
 // The five-call lifecycle: Init -> (per frame: ProcessEvent, Update, ...build UI...,
 // Render) -> Shutdown.
 //
-// VERIFICATION: built headless, this file is checked to COMPILE + LINK against
-// SFML + Dear ImGui + imgui-sfml. The overlay/window are not run here; the logic
-// behind the widgets (set_ball_speed, FrameProfiler) is covered by ctest.
+// TESTING: ctest never opens the window, so run the app to check the overlay.
+// The logic behind the widgets (set_ball_speed, FrameProfiler) is covered by ctest.
 // ============================================================================
 
 #include <imgui-SFML.h>
@@ -92,22 +91,37 @@ int main() {
 
     sf::Clock clock;
     while (window.isOpen()) {
+        // During each ImGui::SFML::Update, ImGui works out whether the mouse or
+        // keyboard belongs to the UI (cursor over the panel, a slider being
+        // dragged or typed into) and publishes it as io.WantCapture*. These
+        // flags reflect last frame's UI, which is the standard way to read them.
+        // ImGui does NOT swallow events for us: the game must ask, and ignore
+        // input that ImGui has claimed.
+        const ImGuiIO& io = ImGui::GetIO();
+
         sf::Event event;
         while (window.pollEvent(event)) {
-            // 2) Feed every event to ImGui FIRST so it can claim clicks/keys on
-            // the panel before the game reacts to them.
+            // 2) Feed every event to ImGui FIRST, then let the game react only
+            // to input ImGui hasn't claimed.
             ImGui::SFML::ProcessEvent(window, event);
             if (event.type == sf::Event::Closed) {
-                window.close();
+                window.close();  // window events always reach the game
+            } else if (event.type == sf::Event::KeyPressed && !io.WantCaptureKeyboard) {
+                if (event.key.code == sf::Keyboard::Escape) {
+                    window.close();
+                }
             }
+            // (Mouse events would be gated the same way with io.WantCaptureMouse.)
         }
 
         const sf::Time elapsed = clock.restart();
+        // Profile the RAW frame time. Sampling the clamped dt below would cap
+        // the readout at 20 FPS and hide exactly the hitches we want to see.
+        profiler.add_sample(elapsed.asSeconds());
         float dt = elapsed.asSeconds();
         if (dt > 0.05f) {
-            dt = 0.05f;  // same tunnelling guard as stage 18
+            dt = 0.05f;  // same tunnelling guard as stage 18 — simulation only
         }
-        profiler.add_sample(dt);
 
         // 3) UPDATE ImGui (it needs the frame's dt as an sf::Time).
         ImGui::SFML::Update(window, elapsed);
@@ -132,16 +146,19 @@ int main() {
 
         // --- simulate (unless paused) ---------------------------------------
         if (!paused) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+            // isKeyPressed reads the hardware directly, bypassing events, so it
+            // needs the same gate: no paddle movement while ImGui owns the keys.
+            const bool game_has_keyboard = !io.WantCaptureKeyboard;
+            if (game_has_keyboard && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
                 state.left.pos.y -= state.left.speed * dt;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+            if (game_has_keyboard && sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
                 state.left.pos.y += state.left.speed * dt;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+            if (game_has_keyboard && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                 state.right.pos.y -= state.right.speed * dt;
             }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            if (game_has_keyboard && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                 state.right.pos.y += state.right.speed * dt;
             }
             pong::clamp_paddle(state.left, court);

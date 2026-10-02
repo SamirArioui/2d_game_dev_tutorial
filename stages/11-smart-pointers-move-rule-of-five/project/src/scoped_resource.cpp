@@ -31,11 +31,15 @@ ScopedResource::~ScopedResource() {
 ScopedResource::ScopedResource(const ScopedResource& other) : handle_(nullptr) {
     // TODO(stage 11): DEEP copy — copy other.label_ and allocate a fresh
     // handle_ = new int(*other.handle_); then log("copy ctor").
+    // Careful: `other` may be moved-from (handle_ == nullptr). Copy that as empty
+    // instead of dereferencing null.
 }
 
 ScopedResource& ScopedResource::operator=(const ScopedResource& other) {
-    // TODO(stage 11): guard self-assignment, delete the old handle_, deep-copy
-    // other's handle_ and label_, then log("copy assign").
+    // TODO(stage 11): deep-copy other's handle_ (null stays null) into a NEW pointer
+    // FIRST, copy label_, THEN delete the old handle_ and store the new one; then
+    // log("copy assign"). Allocating before deleting means a throwing `new` leaves
+    // *this intact, and it makes x = x safe without a special check.
     return *this;
 }
 

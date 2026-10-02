@@ -97,6 +97,44 @@ TEST_CASE("steps_to_run drains the accumulator in whole fixed slices", "[sim][ac
         int steps = sim::steps_to_run(acc, 1.0f, fixed_dt, 8);
         REQUIRE(steps == 8);
     }
+
+    SECTION("hitting the cap drops the backlog instead of carrying it") {
+        float acc = 0.0f;
+        // After the 8 capped steps ~0.93 s would still be banked. Keeping it
+        // would make every following frame run 8 steps AND push alpha far
+        // past 1 — so the accumulator must end up below one slice.
+        sim::steps_to_run(acc, 1.0f, fixed_dt, 8);
+        REQUIRE(acc >= 0.0f);
+        REQUIRE(acc < fixed_dt);
+
+        // The next normal frame behaves normally again.
+        int steps = sim::steps_to_run(acc, 1.0f / 60.0f, fixed_dt, 8);
+        REQUIRE(steps <= 2);
+        REQUIRE(acc < fixed_dt);
+    }
+}
+
+TEST_CASE("a big hitch never produces an out-of-range render alpha", "[sim][accumulator]") {
+    const float fixed_dt = 1.0f / 120.0f;
+    const int max_steps = 8;
+    float acc = 0.0f;
+
+    // Feed a run of frames including a 5-second stall, exactly as main() does.
+    for (float frame_dt : {1.0f / 60.0f, 5.0f, 1.0f / 60.0f, 0.3f, 1.0f / 144.0f}) {
+        sim::steps_to_run(acc, frame_dt, fixed_dt, max_steps);
+        float alpha = sim::interpolation_alpha(acc, fixed_dt);
+        REQUIRE(alpha >= 0.0f);
+        REQUIRE(alpha <= 1.0f);
+        REQUIRE(acc < fixed_dt);
+    }
+}
+
+TEST_CASE("interpolation_alpha is accumulator / fixed_dt, clamped to [0, 1]", "[sim][render]") {
+    const float fixed_dt = 0.01f;
+    REQUIRE(sim::interpolation_alpha(0.0f, fixed_dt) == Catch::Approx(0.0f));
+    REQUIRE(sim::interpolation_alpha(0.0025f, fixed_dt) == Catch::Approx(0.25f));
+    REQUIRE(sim::interpolation_alpha(0.5f, fixed_dt) == Catch::Approx(1.0f));   // never > 1
+    REQUIRE(sim::interpolation_alpha(-0.1f, fixed_dt) == Catch::Approx(0.0f));  // never < 0
 }
 
 TEST_CASE("clamp_frame_dt bounds a single frame's time", "[sim][accumulator]") {

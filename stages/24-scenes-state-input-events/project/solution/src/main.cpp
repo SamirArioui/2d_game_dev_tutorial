@@ -14,11 +14,12 @@
 //   - EventBus                 : scenes announce "point scored" / "game ended" without knowing who
 //                                is listening (here: a HUD/log subscriber set up in main).
 //
-// SAFE TRANSITIONS: a scene never pops itself (that would destroy `this` mid-method). Instead it
-// sets ctx.requested_state, and the main loop performs the transition afterwards, at a safe point.
+// SAFE TRANSITIONS: the SceneStack already defers push/pop made from inside a scene, so popping
+// yourself would be safe. Here scenes don't touch the stack at all: a scene sets ctx.requested,
+// and the main loop checks it against the state machine and performs the transition afterwards.
 //
-// Only this file touches SFML. It is verified to BUILD and LINK; with no display in CI its
-// on-screen behaviour is unverified-by-execution.
+// Only this file touches SFML. The tests never open a window, so check its on-screen
+// behaviour by running the app.
 //
 // Build & run:
 //   cmake -S . -B build && cmake --build build

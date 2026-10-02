@@ -5,8 +5,8 @@
 #   - anim        : the SFML-FREE logic library (frame math + controller).
 #   - anim_tests  : a Catch2 runner linking `anim` only. NO SFML, so it builds
 #                   and runs on a headless machine (this is what `ctest` runs).
-#   - walk_cycle  : the SFML app (window/sprite/text). Build + link is the bar;
-#                   its on-screen behavior is not run in the headless CI here.
+#   - walk_cycle  : the SFML app (window/sprite/text). Not run by ctest;
+#                   launch it yourself to check the animation.
 #
 # Build everything (first configure clones SFML + Catch2 -> needs network):
 #   cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++

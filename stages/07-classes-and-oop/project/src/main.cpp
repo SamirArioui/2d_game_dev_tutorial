@@ -53,8 +53,8 @@ int main() {
 
     // TODO(stage 07): run the battle loop while both are alive. Each round:
     //   log.record("Round " + std::to_string(round)); hero.take_turn(goblin); if the goblin is
-    //   dead, break; else goblin.take_turn(hero); then ++round. `goblin.take_turn` dispatches to
-    //   Enemy::take_turn via `virtual`.
+    //   dead, break; else goblin.take_turn(hero); then ++round. `goblin` is an Enemy object, so
+    //   `goblin.take_turn` calls Enemy::take_turn directly (virtual dispatch needs a ref/pointer).
 
     // TODO(stage 07): pick the winner through a base-class pointer (Character*) — whichever is
     //   still alive — and print "\nWinner: <name> (<hp> hp left)\n" using the const getters.

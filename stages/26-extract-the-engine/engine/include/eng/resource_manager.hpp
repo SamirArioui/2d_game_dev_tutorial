@@ -34,10 +34,13 @@ public:
     // reusing the cached copy afterwards. The returned reference stays valid for
     // the manager's lifetime.
     //
-    // Why store unique_ptr<T> and not T? Because an unordered_map may REHASH as
-    // it grows, moving its elements. A T stored by value would change address; a
-    // pointer-to-heap keeps the T itself put, so references we handed out earlier
-    // never dangle.
+    // Why store unique_ptr<T> and not T? std::unordered_map is node-based, so a
+    // rehash invalidates iterators but never moves elements — a T stored by value
+    // would keep its address too. But that's a property of this one container:
+    // switch to a vector or flat_map and growth RELOCATES elements. With
+    // unique_ptr the T has its own heap allocation, so references we handed out
+    // stay valid whatever container holds the pointers. It also allows
+    // non-movable or polymorphic T.
     T& get(const std::string& path) {
         auto it = cache_.find(path);
         if (it != cache_.end()) {

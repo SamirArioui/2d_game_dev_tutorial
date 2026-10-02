@@ -11,8 +11,8 @@ struct Stats {
 
 enum class DamageType { Physical, Fire, Ice };
 
-// One multiplier per damage type, chosen with a switch. default keeps us safe if the enum
-// grows later and we forget to update this table.
+// One multiplier per damage type, chosen with a switch. No `default:`, so -Wswitch warns
+// if the enum grows later and we forget to update this table.
 float damage_multiplier(DamageType type) {
     switch (type) {
         case DamageType::Physical:
@@ -21,9 +21,8 @@ float damage_multiplier(DamageType type) {
             return 1.5f;
         case DamageType::Ice:
             return 0.75f;
-        default:
-            return 1.0f;
     }
+    return 1.0f;  // only reached for an out-of-range value
 }
 
 int main() {

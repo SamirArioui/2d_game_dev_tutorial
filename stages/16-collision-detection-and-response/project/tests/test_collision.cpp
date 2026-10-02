@@ -140,3 +140,57 @@ TEST_CASE("reflect_velocity bounces with restitution", "[response]") {
         REQUIRE(r.y == Catch::Approx(0.0f));
     }
 }
+
+TEST_CASE("resolve_impulse: two moving bodies share one impulse", "[response][impulse]") {
+    const Vec2f n{1.0f, 0.0f};  // normal from B toward A: A is on the right
+
+    SECTION("equal masses, elastic, head-on: the velocities swap") {
+        Vec2f va{-100.0f, 0.0f};  // A moving left, into B
+        Vec2f vb{40.0f, 0.0f};    // B moving right, into A
+        collide::resolve_impulse(va, vb, 1.0f, 1.0f, n, 1.0f);
+        REQUIRE(va.x == Catch::Approx(40.0f));
+        REQUIRE(vb.x == Catch::Approx(-100.0f));
+    }
+
+    SECTION("a moving ball hitting one at rest hands over its motion") {
+        // The bug this function fixes: reflecting each velocity separately
+        // would bounce A back and leave B sitting still.
+        Vec2f va{-100.0f, 0.0f};
+        Vec2f vb{0.0f, 0.0f};
+        collide::resolve_impulse(va, vb, 1.0f, 1.0f, n, 1.0f);
+        REQUIRE(va.x == Catch::Approx(0.0f).margin(1e-4));
+        REQUIRE(vb.x == Catch::Approx(-100.0f));
+    }
+
+    SECTION("momentum is conserved for unequal masses") {
+        const float ma = 1.0f;
+        const float mb = 3.0f;
+        Vec2f va{-90.0f, 25.0f};
+        Vec2f vb{30.0f, -10.0f};
+        const Vec2f before = va * ma + vb * mb;
+        collide::resolve_impulse(va, vb, 1.0f / ma, 1.0f / mb, n, 0.6f);
+        const Vec2f after = va * ma + vb * mb;
+        REQUIRE(after.x == Catch::Approx(before.x));
+        REQUIRE(after.y == Catch::Approx(before.y));
+        // Tangential (y) components are untouched by a normal impulse.
+        REQUIRE(va.y == Catch::Approx(25.0f));
+        REQUIRE(vb.y == Catch::Approx(-10.0f));
+    }
+
+    SECTION("an immovable B (inverse mass 0) behaves like reflect_velocity") {
+        Vec2f va{-100.0f, 30.0f};
+        Vec2f vb{0.0f, 0.0f};
+        collide::resolve_impulse(va, vb, 1.0f, 0.0f, n, 1.0f);
+        REQUIRE(va.x == Catch::Approx(100.0f));
+        REQUIRE(va.y == Catch::Approx(30.0f));
+        REQUIRE(vb == Vec2f{0.0f, 0.0f});
+    }
+
+    SECTION("bodies already separating are left alone") {
+        Vec2f va{50.0f, 0.0f};  // A moving away from B
+        Vec2f vb{-20.0f, 0.0f};
+        collide::resolve_impulse(va, vb, 1.0f, 1.0f, n, 1.0f);
+        REQUIRE(va.x == Catch::Approx(50.0f));
+        REQUIRE(vb.x == Catch::Approx(-20.0f));
+    }
+}

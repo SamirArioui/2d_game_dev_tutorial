@@ -81,6 +81,7 @@ public:
     void update(float dt);                          // TOP scene only
     void handle_input(const sf::Event& event);      // TOP scene only
     void render(sf::RenderTarget& target);          // ALL scenes, bottom-to-top (overlays compose)
+    // + a queue of pending push/pops, applied at a safe point (see the lifetime note below)
 };
 ```
 
@@ -88,10 +89,15 @@ Ownership is via `std::unique_ptr` (stage 11): the stack is the single owner, an
 the scene automatically. `update` and `handle_input` go to the **top scene only** (the one in
 focus); `render` draws **every** scene bottom-to-top so an overlay layers over the game beneath it.
 
-> **A subtle lifetime rule you'll meet in the mini-project.** A scene must **never pop itself**
-> from inside its own `update`/`handle_input` — popping destroys the object while its method is
-> still running (use-after-free). The demo solves this by having scenes *request* a transition
-> (set a flag) that the main loop applies afterwards, at a safe point.
+> **A subtle lifetime rule you'll meet in the mini-project.** If `pop()` destroyed the scene
+> immediately, a scene that popped itself from inside its own `update`/`handle_input` would be
+> deleted while its method is still running (use-after-free). Likewise, pushing from inside
+> `render` would grow `scenes_` while `render` is looping over it. The fix is to **defer**: while
+> the stack is calling into a scene it is *busy*, and `push`/`pop` only **queue** the change;
+> `apply_pending()` performs the queue once the scene's method has returned — a safe point. The
+> project's `SceneStack` does exactly this (see `scene_stack.hpp`), and a test pops a scene from
+> inside its own `update`. The demo goes one step further: scenes don't touch the stack at all,
+> they *request* a state transition that the main loop validates with the state machine.
 
 ---
 
@@ -174,6 +180,17 @@ Handlers are stored as **`std::function<void(int)>`** (stage 09) — C++'s type-
 callable", which can hold a free function or a capturing lambda. Emitting an event nobody listens
 to is a harmless no-op.
 
+Two lifetime rules make a bus safe to use in a real game:
+
+- **Unsubscribe before the listener dies.** `subscribe` returns a `SubscriptionId`. A scene that
+  subscribed `[this](int) { ... }` must call `bus.unsubscribe(id)` (typically in its destructor);
+  otherwise, after the scene is popped, the bus would call a lambda whose `this` is a dead object.
+- **Handlers may (un)subscribe during `emit`.** A handler that subscribes `push_back`s onto the very
+  vector `emit` is looping over, which may reallocate it — a plain range-for is then undefined
+  behaviour. The project's `emit` loops by index up to the size at the start (new subscribers run
+  from the next emit), calls a *copy* of each handler, and only blanks unsubscribed entries,
+  erasing them once no `emit` is running. Both rules are pinned by tests.
+
 ### Python comparison
 
 Exactly `defaultdict(list)` of callbacks: `handlers[event].append(cb)` then
@@ -194,7 +211,7 @@ Four subsystems, three of them header-only, **all SFML-free**:
 
 Because the scene stack is SFML-free (forward-declared `sf` types), the test can push a **mock
 scene** and verify push/pop/top and that only the top scene updates — no window required. The
-concrete scenes' *rendering* stays unverified-by-execution; everything else is pinned by 12 tests.
+concrete scenes' *rendering* you check by running the app; everything else is pinned by 16 tests.
 
 ---
 
@@ -209,7 +226,7 @@ cd project
 # --- Fast path: tests only (no SFML, no display) ---
 cmake -S . -B build -DBUILD_APP=OFF
 cmake --build build
-ctest --test-dir build --output-on-failure        # 12 tests — RED until you implement the TODOs
+ctest --test-dir build --output-on-failure        # 16 tests — RED until you implement the TODOs
 
 # --- Full path: also build the SFML demo ---
 cmake -S . -B build
@@ -284,8 +301,7 @@ ctest --test-dir project/solution/build --output-on-failure   # all green
 ```
 
 Text is drawn only if a system font loads (skipped gracefully otherwise), so the app builds and
-links anywhere. Build + link of your version is verified; on-screen behaviour is
-unverified-by-execution.
+links anywhere. Run it to check the on-screen behaviour yourself.
 
 ---
 
@@ -299,8 +315,8 @@ unverified-by-execution.
 - [ ] My state machine rejects illegal transitions and leaves state unchanged.
 - [ ] My input map decouples keys from actions, and I can rebind in one place.
 - [ ] I built a `std::function` event bus and understand subscribe/emit as the observer pattern.
-- [ ] I understand why a scene must not pop itself mid-method, and how deferring the transition
-      fixes it.
+- [ ] I understand why destroying a scene from inside its own method is a use-after-free, and how
+      deferring the change (queue it, apply it after the call returns) fixes it.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md).
 

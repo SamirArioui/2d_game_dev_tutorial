@@ -151,8 +151,8 @@ The complete, all-green reference is in [`project/solution/`](project/solution/)
 way (`cmake -S project/solution -B project/solution/build && cmake --build project/solution/build`)
 to see `100% tests passed`.
 
-> **Sandbox / offline note:** the first `cmake` clones SFML and Catch2 from `github.com`; run it
-> with the sandbox disabled if your network is restricted. Later builds are offline (cached in
+> **Offline note:** the first `cmake` clones SFML and Catch2 from `github.com`, so run it
+> while you have network access. Later builds are offline (cached in
 > `build/_deps`). **If linking fails**, add `-DCMAKE_CXX_COMPILER=/usr/bin/clang++`.
 
 ---
@@ -199,9 +199,8 @@ placeholder returns. The starter compiles and links, but the tests in
 [`project/tests/test_camera.cpp`](project/tests/test_camera.cpp) are **RED** until you fill them in.
 The contract (formulas + edge cases) for each function is in
 [`project/include/game/camera.hpp`](project/include/game/camera.hpp). Implement them, run `ctest`,
-and drive it to green — the SFML `sf::View` / parallax / HUD layer is already done for you (that half
-is *unverified-by-execution* on the build machine anyway; the bar is that it **builds and links**,
-while the camera *maths* you write is proven by the tests).
+and drive it to green — the SFML `sf::View` / parallax / HUD layer is already done for you (check that half
+by running the demo; the camera *maths* you write is proven by the tests).
 
 Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
 (`cmake -S project/solution -B project/solution/build`) to compare.

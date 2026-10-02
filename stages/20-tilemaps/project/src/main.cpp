@@ -7,8 +7,8 @@
 // That separation is the lesson: the interesting logic is testable; this glue
 // just draws it and reads the keyboard.
 //
-// NOTE: this stage's bar is that the program BUILDS AND LINKS. Actual window
-// behaviour is not verified here (the build machine has no display).
+// NOTE: ctest never opens this window. The map logic is unit-tested; check the
+// rendering and keyboard handling by running the demo.
 // ============================================================================
 
 #include <SFML/Graphics.hpp>

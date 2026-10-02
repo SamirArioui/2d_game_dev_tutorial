@@ -5,7 +5,8 @@
 enum class DamageType { Physical, Fire, Ice };
 
 // Map each enum value to a readable name. Returning const char* (a string literal) is
-// fine and cheap here. The default guards against a value we forgot to handle.
+// fine and cheap here. No `default:` on purpose: if DamageType gains a value we forget
+// to handle, -Wswitch warns. The return after the switch covers out-of-range values.
 const char* type_name(DamageType t) {
     switch (t) {
         case DamageType::Physical:
@@ -14,9 +15,8 @@ const char* type_name(DamageType t) {
             return "Fire";
         case DamageType::Ice:
             return "Ice";
-        default:
-            return "Unknown";
     }
+    return "Unknown";  // only reached for an out-of-range value
 }
 
 int main() {

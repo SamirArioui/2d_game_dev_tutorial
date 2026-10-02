@@ -129,7 +129,10 @@ write:
   defaults are correct. **This is what you should do almost always.**
 - **Rule of 3** — if a class owns a raw resource so that it needs a custom **destructor**, it almost
   certainly also needs a custom **copy constructor** and **copy assignment** (else the default
-  shallow copy duplicates the raw pointer and double-frees). Pre-C++11.
+  shallow copy duplicates the raw pointer and double-frees). Pre-C++11. Write copy assignment as
+  **allocate the new copy first, then release the old one** (or use the *copy-and-swap* idiom). If you
+  `delete` first and the `new` then throws, the object is left holding a dangling pointer that its
+  destructor frees a second time.
 - **Rule of 5** — C++11 adds the **move constructor** and **move assignment** for cheap ownership
   transfer. If you're writing the other three, add these two so your type moves efficiently.
 
@@ -140,6 +143,28 @@ struct Rule0 {                 // ✅ owns nothing raw -> writes zero special me
     std::vector<int> scores;
 };                             // copy/move/destroy all handled correctly by defaults
 ```
+
+**The catch for polymorphic base classes.** A base like `Character` needs a `virtual` destructor
+(section 6), and *declaring* a destructor, even `= default`, has a side effect: the compiler no
+longer generates the **move** operations. Copies still work, so "moving" a `Character` silently
+copies instead. That's harmless when entities live behind a `unique_ptr` and the object itself is
+never moved, which is the case in this stage. If you do need to copy or move the object itself,
+spell all five out as defaults:
+
+```cpp
+class Character {
+public:
+    virtual ~Character() = default;
+    Character(const Character&) = default;
+    Character& operator=(const Character&) = default;
+    Character(Character&&) = default;
+    Character& operator=(Character&&) = default;
+    // ...
+};
+```
+
+So a polymorphic base is "rule of 0 for its *members*" (it owns nothing raw), but it isn't
+literally zero special members.
 
 The exercise and mini-project build a raw-owning class (`ScopedResource`) whose five members each
 **log**, so you can watch which one fires for `x = y;` vs `x = std::move(y);` vs leaving a scope.
@@ -220,8 +245,10 @@ in [`main.cpp`](project/src/main.cpp) and the rule-of-5 class in
 `entity.hpp`.) It brings the whole stage together on the course's `Character`/`Enemy` types:
 
 - entities live in a **`std::vector<std::unique_ptr<Character>>`** — the vector exclusively owns each
-  one, and `describe()` dispatches virtually (`Character` follows the **rule of 0**: it holds a
-  `std::string`, ints, and a `shared_ptr`, so it declares none of the five special members);
+  one, and `describe()` dispatches virtually (`Character`'s members follow the **rule of 0**: it holds a
+  `std::string`, ints, and a `shared_ptr`, all self-managing. Its only special member is the
+  `virtual` destructor a polymorphic base needs, which also switches off the implicit moves. That's
+  fine here because entities are only ever moved *as `unique_ptr`s*, see section 5);
 - several enemies **share one `std::shared_ptr<SpriteStub>`** — the demo prints `use_count()` climbing
   to 4 as goblins reference it and falling back to 1 when the entities are released;
 - a named `unique_ptr` is handed into the vector with **`std::move`** (source left empty);

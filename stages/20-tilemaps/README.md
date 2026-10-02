@@ -156,9 +156,9 @@ The complete, all-green reference is in [`project/solution/`](project/solution/)
 way (`cmake -S project/solution -B project/solution/build && cmake --build project/solution/build`)
 to see `100% tests passed`.
 
-> **Sandbox / offline note:** the first `cmake` reaches `github.com` to clone SFML and Catch2. After
-> that they're cached under `build/_deps` and later builds are offline. If your machine sandboxes
-> network access, run that first configure with the sandbox disabled.
+> **Offline note:** the first `cmake` reaches `github.com` to clone SFML and Catch2. After
+> that they're cached under `build/_deps` and later builds are offline, so run that first
+> configure while you have network access.
 >
 > **If linking fails**, force the compiler: `cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/clang++`.
 
@@ -229,9 +229,8 @@ compiles and links, but the parser tests in
 [`project/tests/test_tilemap.cpp`](project/tests/test_tilemap.cpp) are **RED** until you fill them
 in. The contract for each method is in
 [`project/include/game/tilemap.hpp`](project/include/game/tilemap.hpp). Implement them, run `ctest`,
-and drive it to green — the SFML renderer and window are already done for you (that half is
-*unverified-by-execution* on the build machine anyway; the bar is that it **builds and links**,
-while the map *logic* you write is proven by the tests).
+and drive it to green — the SFML renderer and window are already done for you (check that half
+by running the demo; the map *logic* you write is proven by the tests).
 
 Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
 (`cmake -S project/solution -B project/solution/build`) to compare.

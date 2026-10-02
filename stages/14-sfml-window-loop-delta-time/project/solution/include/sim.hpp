@@ -89,6 +89,13 @@ inline bool reflect_in_bounds(Ball& ball, float width, float height) {
 // leftover stays in `accumulator` for next time. `max_steps` caps the count so
 // one long stall (a breakpoint, dragging the window) can't demand hundreds of
 // catch-up steps and freeze the game — the dreaded "spiral of death".
+//
+// If the cap is hit with whole slices STILL banked, we throw that backlog away
+// (the game briefly runs slower than real time instead of trying to catch up).
+// Keeping it would be a bug: the accumulator would stay above `fixed_dt`, the
+// render alpha (accumulator / fixed_dt) would blow past 1, and the next frames
+// would keep paying off a debt they can never clear. After this function,
+// 0 <= accumulator < fixed_dt always holds.
 inline int steps_to_run(float& accumulator, float frame_dt, float fixed_dt, int max_steps) {
     accumulator += frame_dt;
 
@@ -97,7 +104,20 @@ inline int steps_to_run(float& accumulator, float frame_dt, float fixed_dt, int 
         accumulator -= fixed_dt;
         ++steps;
     }
+    if (accumulator >= fixed_dt) {
+        accumulator = 0.0f;  // capped out: drop the backlog we refuse to simulate
+    }
     return steps;
+}
+
+// The render-blend factor: how far we are into the NEXT fixed slice, as a
+// fraction in [0, 1]. Clamped so that even a bad accumulator value can never
+// make render_lerp EXTRApolate the ball off-screen.
+inline float interpolation_alpha(float accumulator, float fixed_dt) {
+    float alpha = accumulator / fixed_dt;
+    if (alpha < 0.0f) return 0.0f;
+    if (alpha > 1.0f) return 1.0f;
+    return alpha;
 }
 
 // Clamp a single frame's dt so one huge hitch (the OS suspended us, the user

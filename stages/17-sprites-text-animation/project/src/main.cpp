@@ -10,8 +10,8 @@
 //   * sf::Font / sf::Text -> an on-screen label, loaded with GRACEFUL fallback
 //                   so a missing font never hard-crashes the program.
 //
-// NOTE ON VERIFICATION: this course is built headless, so this file is checked
-// to COMPILE and LINK against SFML, but its on-screen behavior is not run here.
+// NOTE ON TESTING: ctest never opens this window, so run the app and check it
+// by eye.
 // The frame math it relies on IS covered by unit tests (tests/test_animation).
 // ============================================================================
 

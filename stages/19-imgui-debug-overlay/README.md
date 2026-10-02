@@ -67,8 +67,20 @@ ImGui::SFML::Shutdown();                    // 5) once at the end
 
 Order matters:
 
-- **`ProcessEvent` before your own handling** so ImGui can "capture" a click on the panel and the
-  game can ignore it (otherwise clicking a slider would also move a paddle).
+- **`ProcessEvent` before your own handling**, then **check whether ImGui wants the input**. ImGui
+  does **not** swallow events for you — every event still reaches your loop. The game must check
+  `ImGui::GetIO().WantCaptureMouse` / `WantCaptureKeyboard` and ignore input ImGui has claimed
+  (otherwise typing a value into a slider would also move a paddle). Remember the gate also applies
+  to *polled* input like `sf::Keyboard::isKeyPressed`, which bypasses events entirely:
+
+  ```cpp
+  ImGui::SFML::ProcessEvent(window, event);
+  if (event.type == sf::Event::KeyPressed && !ImGui::GetIO().WantCaptureKeyboard) {
+      /* game key handling */
+  }
+  // ...
+  if (!ImGui::GetIO().WantCaptureKeyboard && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) { /* ... */ }
+  ```
 - **`Render` after you draw the game** so the overlay sits on top.
 - **`Update` takes the frame's `sf::Time`**, which is why we `clock.restart()` once and reuse that
   value for both ImGui and the game's `dt`.
@@ -103,9 +115,13 @@ we average over a window of recent frames. `debug::FrameProfiler` is a small **r
 running sum, so each update is O(1):
 
 ```cpp
-profiler.add_sample(dt);          // push dt; evict + subtract the oldest once full
+profiler.add_sample(raw_dt);      // push dt; evict + subtract the oldest once full
 profiler.fps();                   // 1 / (sum / count)
 ```
+
+Feed the profiler the **raw** frame time, *before* the `dt > 0.05f` tunnelling clamp. The clamp is a
+simulation safety net; if you profile the clamped value, the readout can never drop below 20 FPS and
+the hitches you're hunting for disappear from the graph.
 
 That's the seed of real profiling: the same "measure per-frame cost, average it, show it" loop
 scales up to timing individual subsystems later. The profiler is pure and tested (steady-stream
@@ -173,10 +189,8 @@ cmake --build project/solution/build
 ctest --test-dir project/solution/build --output-on-failure
 ```
 
-**On this course's headless build machine**, `pong_imgui` is verified to **compile and link**
-against SFML + Dear ImGui + imgui-sfml; the overlay and window are *unverified-by-execution*. The
-logic behind every widget (`set_ball_speed`, `FrameProfiler`) plus the reused Pong rules are
-covered by `ctest` and run here.
+`ctest` never opens a window, so run `pong_imgui` to check the overlay by eye. The logic behind
+every widget (`set_ball_speed`, `FrameProfiler`) plus the reused Pong rules are covered by `ctest`.
 
 ---
 

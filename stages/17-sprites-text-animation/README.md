@@ -196,9 +196,8 @@ cmake --build project/solution/build
 ctest --test-dir project/solution/build --output-on-failure
 ```
 
-**On this course's headless build machine**, the app is verified to **compile and link** against
-SFML; its on-screen behavior is *unverified-by-execution*. The frame math it relies on is fully
-covered by unit tests that **do** run here.
+`ctest` never opens a window, so run the app to check the animation by eye. The frame math it
+relies on is fully covered by unit tests.
 
 ---
 

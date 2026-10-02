@@ -12,15 +12,14 @@ public:
         delete data_;
     }
 
-    Resource(const Resource& other) : id_(next_id_++), data_(new int(*other.data_)) {
-        log("copy ctor");
+    Resource(const Resource& other) : id_(next_id_++), data_(other.data_ ? new int(*other.data_) : nullptr) {
+        log("copy ctor");  // a moved-from `other` (data_ == nullptr) copies as empty
     }
 
     Resource& operator=(const Resource& other) {
-        if (this != &other) {
-            delete data_;
-            data_ = new int(*other.data_);
-        }
+        int* fresh = other.data_ ? new int(*other.data_) : nullptr;  // allocate FIRST
+        delete data_;                                                // then release ours
+        data_ = fresh;
         log("copy assign");
         return *this;
     }

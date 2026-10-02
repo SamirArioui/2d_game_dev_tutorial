@@ -13,8 +13,8 @@
 //     entity list — see project/src/systems.cpp, which is unit-tested with no window in sight.
 //
 // This file is the ONLY part that touches SFML: it reads input, calls the systems, and draws a
-// rectangle per entity. Because CI here has no display, this is verified to BUILD and LINK; its
-// on-screen behaviour is unverified-by-execution.
+// rectangle per entity. The tests never open a window, so check its on-screen behaviour by
+// running the app.
 //
 // Build & run:
 //   cmake -S . -B build && cmake --build build

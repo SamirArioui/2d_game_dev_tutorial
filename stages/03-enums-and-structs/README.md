@@ -123,10 +123,16 @@ float damage_multiplier(DamageType type) {
         case DamageType::Physical: return 1.0f;
         case DamageType::Fire:     return 1.5f;
         case DamageType::Ice:      return 0.75f;
-        default:                   return 1.0f;   // safety net if the enum grows
     }
+    return 1.0f;   // only reached if `type` holds a value that isn't one of the names
 }
 ```
+
+Notice there is **no `default:`**. That's deliberate. With every enumerator listed and no
+`default`, `-Wall` (via `-Wswitch`) warns the moment someone adds `DamageType::Poison` and forgets
+this switch. A `default:` would silently swallow the new value and hide the bug. The `return` after
+the switch keeps every path returning a value (some compilers warn without it), because an
+`enum class` variable *can* technically hold an out-of-range integer.
 
 **Why `enum class` and not a plain `enum`?** Two safety wins the course insists on:
 

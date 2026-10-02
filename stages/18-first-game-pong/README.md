@@ -164,10 +164,8 @@ cmake --build project/solution/build
 ctest --test-dir project/solution/build --output-on-failure
 ```
 
-**On this course's headless build machine**, the `pong` app is verified to **compile and link**
-against SFML graphics/window/system/**audio**; the window and sound are *unverified-by-execution*.
-Every rule (motion, wall bounce, paddle bounce + spin, scoring, serving) is covered by `ctest` and
-runs here.
+`ctest` never opens a window or plays a sound, so play the `pong` app to check those by eye and
+ear. Every rule (motion, wall bounce, paddle bounce + spin, scoring, serving) is covered by `ctest`.
 
 ---
 

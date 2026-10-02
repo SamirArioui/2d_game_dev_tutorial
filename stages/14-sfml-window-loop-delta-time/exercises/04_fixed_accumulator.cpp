@@ -9,7 +9,9 @@
 //   1. adds `frame_dt` to `accumulator`,
 //   2. subtracts `fixed_dt` and counts a step while `accumulator >= fixed_dt`,
 //   3. stops early once it has counted `max_steps` (spiral-of-death cap),
-//   4. leaves the leftover in `accumulator` for next frame,
+//   4. leaves the leftover in `accumulator` for next frame — but if it
+//      stopped because of the cap with a whole slice still banked, resets
+//      `accumulator` to 0 (drop the backlog, don't carry it forever),
 //   5. returns the number of steps counted.
 //
 // Build & test (from exercises/):
@@ -54,4 +56,6 @@ TEST_CASE("max_steps caps the work per call (no spiral of death)") {
     const float fixed_dt = 1.0f / 120.0f;
     float acc = 0.0f;
     REQUIRE(steps_to_run(acc, 1.0f, fixed_dt, 8) == 8);
+    // The un-simulated backlog is dropped, not carried into the next frame.
+    REQUIRE(acc < fixed_dt);
 }

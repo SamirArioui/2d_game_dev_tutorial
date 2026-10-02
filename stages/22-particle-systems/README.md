@@ -153,8 +153,8 @@ The complete, all-green reference is in [`project/solution/`](project/solution/)
 way (`cmake -S project/solution -B project/solution/build && cmake --build project/solution/build`)
 to see `100% tests passed`.
 
-> **Sandbox / offline note:** the first `cmake` clones SFML and Catch2 from `github.com`; run it
-> with the sandbox disabled if your network is restricted. Later builds are offline (cached in
+> **Offline note:** the first `cmake` clones SFML and Catch2 from `github.com`, so run it
+> while you have network access. Later builds are offline (cached in
 > `build/_deps`). **If linking fails**, add `-DCMAKE_CXX_COMPILER=/usr/bin/clang++`.
 
 ---
@@ -210,8 +210,8 @@ tests in [`project/tests/test_pool.cpp`](project/tests/test_pool.cpp) are **RED*
 in. The invariants each function must uphold are documented in
 [`project/include/game/particle_pool.hpp`](project/include/game/particle_pool.hpp). Implement them,
 run `ctest`, and drive it to green — the SFML renderer (including the `life/max_life` alpha fade) and
-demo are already done for you (that half is *unverified-by-execution* on the build machine anyway;
-the bar is that it **builds and links**, while the pool *logic* you write is proven by the tests).
+demo are already done for you (check that half by running the demo;
+the pool *logic* you write is proven by the tests).
 
 Stuck? A complete reference is in [`project/solution/`](project/solution/) — build it standalone
 (`cmake -S project/solution -B project/solution/build`) to compare.

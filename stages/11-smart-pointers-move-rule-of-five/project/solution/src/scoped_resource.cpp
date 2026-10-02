@@ -16,17 +16,21 @@ ScopedResource::~ScopedResource() {
     delete handle_;  // delete on nullptr is safe
 }
 
+// Deep copy. `other` may be a moved-from (empty) object, so copy "empty" as empty
+// instead of dereferencing a null handle.
 ScopedResource::ScopedResource(const ScopedResource& other)
-    : label_(other.label_), handle_(new int(*other.handle_)) {  // deep copy
+    : label_(other.label_), handle_(other.handle_ ? new int(*other.handle_) : nullptr) {
     log("copy ctor");
 }
 
+// Allocate FIRST, then release the old handle. If `new` throws, *this is untouched
+// (no dangling handle_ for the destructor to double-free). The same order also
+// makes self-assignment (x = x) safe without a special check.
 ScopedResource& ScopedResource::operator=(const ScopedResource& other) {
-    if (this != &other) {  // guard self-assignment
-        delete handle_;
-        handle_ = new int(*other.handle_);
-        label_ = other.label_;
-    }
+    int* fresh = other.handle_ ? new int(*other.handle_) : nullptr;
+    label_ = other.label_;  // std::string assignment is self-assignment safe
+    delete handle_;
+    handle_ = fresh;
     log("copy assign");
     return *this;
 }

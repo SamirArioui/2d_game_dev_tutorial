@@ -218,9 +218,8 @@ Two movers, one per half of the stage:
 
 Positions are computed entirely in `gmath::Vec2f` and handed to SFML only through
 `to_sfml()`. The maths — integration steps, `normalize`, `lerp`, easing — is
-covered by the Catch2 suite you can run headless here. The window itself is
-*unverified-by-execution* in this course's build box (no display) but compiles
-and links against SFML.
+covered by the Catch2 suite, which runs without opening a window. Run the app
+to check the window itself.
 
 ```bash
 cd project

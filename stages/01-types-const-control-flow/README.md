@@ -101,9 +101,17 @@ it becomes `const&` parameters, and in stage 07 `const` member functions. Get in
 
 ## 4. `static_cast` and the integer-division trap
 
-C++ does **not** silently convert between number types when it might lose information — you ask
-explicitly with `static_cast<TargetType>(value)`. This shows up constantly because of one sharp
-edge: **integer division throws away the remainder.**
+Careful: C++ **will** silently convert between number types, even when information is lost.
+`int x = 3.9;` compiles and quietly stores `3` (with `-Wall -Wextra` you may get a warning, but not
+always). Two habits protect you:
+
+- **Brace initialization refuses narrowing.** `int x{3.9};` is a compile error, so prefer `{}` when
+  you initialize from a value of another type.
+- **Make intended conversions explicit** with `static_cast<TargetType>(value)`, so a reader (and
+  you, later) can see the conversion was on purpose.
+
+Conversions show up constantly because of one sharp edge: **integer division throws away the
+remainder.**
 
 ```cpp
 int total_xp = 250;
@@ -320,7 +328,11 @@ clang++ -std=c++17 -Wall -Wextra project/src/main.cpp -o battle
 echo $?          # should print 0
 ```
 
-The seed is fixed (`121`), so what your finished program should print is exactly:
+The seed is fixed (`121`), so the program prints the same fight every run. The output below comes
+from macOS / libc++ (Apple clang). The C++ standard fixes the numbers `std::mt19937` produces, but
+not how `std::uniform_int_distribution` maps them to a range. On libstdc++ (GCC/Linux) or MSVC your
+rolls will differ. What is guaranteed is that **the same seed gives the same sequence on the same
+toolchain**:
 
 ```
 == The gauntlet ==

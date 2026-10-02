@@ -3,8 +3,9 @@
 // Generalize the memoization into a reusable templated cache: load a resource of type T on first
 // use, then hand back the SAME instance every time. This is the shared ResourceManager contract.
 //
-// We store unique_ptr<T> (not T) so the object lives at a stable heap address — the reference we
-// return stays valid even if the map rehashes, and we never copy a big resource.
+// We store unique_ptr<T> (not T) so the object lives at a stable heap address of its own — the
+// reference we return stays valid whatever container holds the pointers (unordered_map never moves
+// its elements, but vector or flat_map would), and we never copy a big resource.
 //
 // TODO: implement get():
 //   - on a cache HIT, return the stored instance;

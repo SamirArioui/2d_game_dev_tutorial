@@ -9,6 +9,13 @@
 //
 // It owns its scenes via unique_ptr (stage 11): the stack is the single owner, and popping a
 // scene destroys it automatically (RAII). Still SFML-free — see scene.hpp for why.
+//
+// DEFERRED CHANGES: push()/pop() may be called from INSIDE a scene's own update/handle_input/
+// render — e.g. a pause menu that pops itself. Destroying that scene right away would delete
+// `this` while its method is still running (use-after-free), and pushing while render() walks
+// scenes_ could reallocate the vector under the loop. So while the stack is calling into a scene
+// it only QUEUES the change; apply_pending() performs the queue once that call has returned.
+// Outside such a call (e.g. from main) push/pop take effect immediately.
 // ===========================================================================
 
 #include <cstddef>
@@ -35,7 +42,18 @@ public:
     void render(sf::RenderTarget& target);
 
 private:
+    // One queued change. scene is the scene to push (empty for a pop).
+    struct PendingChange {
+        bool is_push;
+        std::unique_ptr<Scene> scene;
+    };
+
+    void request(PendingChange change);  // queue it, and apply now unless we are busy
+    void apply_pending();                // perform every queued change, in order
+
     std::vector<std::unique_ptr<Scene>> scenes_;
+    std::vector<PendingChange> pending_;
+    bool busy_{false};  // true while we are calling into a scene (or applying changes)
 };
 
 }  // namespace scene

@@ -37,8 +37,9 @@ public:
             return *it->second;  // cache HIT — same instance as last time, no reload
         }
 
-        // cache MISS — load once, then store. unique_ptr means the T lives on the heap at a
-        // STABLE address, so the reference we return stays valid even if the map rehashes later.
+        // cache MISS — load once, then store. unique_ptr means the T lives in its own heap
+        // allocation at a STABLE address, so the reference we return stays valid even if we later
+        // swap unordered_map for a container that relocates elements (vector, flat_map, ...).
         auto resource = std::make_unique<T>();
         if (!resource->loadFromFile(path)) {
             throw std::runtime_error("ResourceManager: failed to load '" + path + "'");

@@ -83,16 +83,34 @@ inline bool reflect_in_bounds(Ball& ball, float width, float height) {
 // leftover stays in `accumulator` for next time. `max_steps` caps the count so
 // one long stall (a breakpoint, dragging the window) can't demand hundreds of
 // catch-up steps and freeze the game — the dreaded "spiral of death".
+//
+// If the cap is hit with whole slices STILL banked, we throw that backlog away
+// (the game briefly runs slower than real time instead of trying to catch up).
+// Keeping it would be a bug: the accumulator would stay above `fixed_dt`, the
+// render alpha (accumulator / fixed_dt) would blow past 1, and the next frames
+// would keep paying off a debt they can never clear. After this function,
+// 0 <= accumulator < fixed_dt always holds.
 inline int steps_to_run(float& accumulator, float frame_dt, float fixed_dt, int max_steps) {
     // TODO(stage 14): add frame_dt to the accumulator, then pull out as many
     // whole fixed_dt slices as fit (subtracting fixed_dt each time), but never
     // more than max_steps. Return the number of steps taken; leave the leftover
-    // in accumulator for next frame.
+    // in accumulator for next frame. If you stopped because of max_steps and a
+    // whole slice is still banked, reset accumulator to 0 (drop the backlog).
     (void)accumulator;
     (void)frame_dt;
     (void)fixed_dt;
     (void)max_steps;
     return 0;  // placeholder: run no steps yet
+}
+
+// The render-blend factor: how far we are into the NEXT fixed slice, as a
+// fraction in [0, 1]. Clamped so that even a bad accumulator value can never
+// make render_lerp EXTRApolate the ball off-screen.
+inline float interpolation_alpha(float accumulator, float fixed_dt) {
+    // TODO(stage 14): return accumulator / fixed_dt, clamped to [0, 1].
+    (void)accumulator;
+    (void)fixed_dt;
+    return 1.0f;  // placeholder: always draws the latest state
 }
 
 // Clamp a single frame's dt so one huge hitch (the OS suspended us, the user

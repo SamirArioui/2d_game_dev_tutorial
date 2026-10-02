@@ -108,7 +108,8 @@ The payoff is concrete: `main()` for Pong shrinks to *configure → push a scene
  │   │   ├── audio.hpp           make_tone — synthesized beeps (no .wav files)
  │   │   ├── font.hpp            load_system_font — graceful fallback
  │   │   └── engine.hpp          umbrella: #include "eng/engine.hpp" gets it all
- │   └── src/                    the .cpp files that actually touch SFML
+ │   ├── src/                    the .cpp files that actually touch SFML
+ │   └── tests/                  engine_tests: scene stack + resource manager (no SFML)
  ├── project/                    the mini-project: Pong on libengine
  │   ├── CMakeLists.txt          fetches SFML + Catch2, adds ../engine, builds pong + tests
  │   ├── src/pong_logic.{hpp,cpp}   PURE rules (unit-tested)             ── YOU implement
@@ -126,10 +127,12 @@ Notice which headers are marked **PURE**: `math`, `collision`, `tilemap`, `resou
 and `sf::Event` instead of including them, because they only ever appear as reference parameters.
 
 That seam is deliberate and it's the same lesson from stage 13 (*keep logic pure and testable,
-separate from rendering*), now applied to the engine itself. The consequence: the entire test
-suite for the engine's core, and for Pong's rules, runs **headless in milliseconds** — no window,
-no GPU, no display. Only the SFML-facing code (`Application`, `Camera`, renderers, audio) needs a
-graphics stack, and that code is thin.
+separate from rendering*), now applied to the engine itself. The consequence: the tests for the
+engine's core (`engine/tests/` → the `engine_tests` target, plus this stage's `exercises/`) and for
+Pong's rules (`project/tests/`) all run **headless in milliseconds** — no window, no GPU, no
+display. `ctest` in the project build runs both `engine_tests` and `pong_tests`. Only the
+SFML-facing code (`Application`, `Camera`, renderers, audio) needs a graphics stack, and that code
+is thin.
 
 ---
 
@@ -161,6 +164,11 @@ void Application::run() {
 `scenes_` is a `SceneStack`; each of those three calls forwards to the **top** scene. Pong never
 sees this loop — it just implements `update` / `render` / `handle_input`.
 
+A scene can change scenes itself through `stack()` (e.g. a menu calling `stack()->pop()` to close).
+The stack **defers** such changes: while it is calling into a scene it only queues them, and
+applies the queue once that call has returned. Destroying the scene immediately would delete
+`this` while its own method is still running (stage 24's lifetime rule).
+
 ---
 
 ## Building and running
@@ -180,15 +188,15 @@ to quit.
 
 Notes and gotchas (mostly environment-specific):
 
-- **Network + sandbox.** `FetchContent` git-clones from GitHub on the first configure. In a
-  sandboxed shell you must allow network for that step.
+- **Network.** `FetchContent` git-clones from GitHub on the first configure, so that step needs
+  network access.
 - **Compiler.** On macOS, SFML's windowing backend is Objective-C++; build with Apple Clang
   (`-DCMAKE_CXX_COMPILER=/usr/bin/clang++`) if your default `c++` can't compile `.mm` files.
 - **SDK not found / "Could NOT find OpenGL".** That means CMake can't locate the macOS SDK
   (usually a broken `xcode-select`). Point it explicitly, e.g.
   `-DCMAKE_OSX_SYSROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk`.
-- **No display.** The build+link and the `ctest` logic tests are the bar here; actually *seeing*
-  the window needs a desktop session. The tests are window-free on purpose.
+- **No display.** The `ctest` logic tests run anywhere; actually *seeing* the window needs a
+  desktop session. The tests are window-free on purpose.
 - **No font on the machine.** `eng::load_system_font` tries common system fonts and reports
   failure gracefully — the game then runs without the on-screen score rather than crashing.
 

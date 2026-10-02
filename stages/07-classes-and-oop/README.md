@@ -154,7 +154,9 @@ Three things C++ needs that Python doesn't:
    second method.
 3. **A `virtual` destructor on the base.** If you'll ever `delete` a derived object through a
    base pointer (stage 11 does exactly this with `unique_ptr<Character>`), the base destructor
-   must be `virtual` so the derived one runs too. Forgetting this leaks the derived parts.
+   must be `virtual` so the derived one runs too. Forgetting this is **undefined behaviour**: the
+   derived destructor typically never runs (so its resources leak), but the standard promises
+   nothing at all about what happens.
 
 | Python | C++ |
 |--------|-----|

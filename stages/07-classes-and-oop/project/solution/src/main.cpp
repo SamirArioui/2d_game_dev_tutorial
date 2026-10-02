@@ -44,7 +44,9 @@ int main() {
     while (hero.is_alive() && goblin.is_alive()) {
         log.record("Round " + std::to_string(round));
 
-        // Dynamic dispatch in action: goblin.take_turn resolves to Enemy::take_turn at run time.
+        // `goblin` is an Enemy object (not a reference or pointer), so goblin.take_turn is
+        // resolved at COMPILE time to Enemy::take_turn. Dynamic dispatch only kicks in when you
+        // call a virtual function through a Character& or Character* (stage 11 does exactly that).
         hero.take_turn(goblin);
         if (!goblin.is_alive()) {
             break;

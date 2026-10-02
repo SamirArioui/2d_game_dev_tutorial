@@ -18,7 +18,8 @@
 // TODO:
 //   1. Define  enum class DamageType { Physical, Fire, Ice };
 //   2. Write  const char* type_name(DamageType t)  that returns "Physical"/"Fire"/"Ice"
-//      using a switch. Include a default case that returns "Unknown".
+//      using a switch. List every enumerator and do NOT add a `default:` (so the compiler
+//      warns if the enum grows); return "Unknown" after the switch.
 //   3. In main, print the name of each of the three values.
 //   4. Print static_cast<int>(DamageType::Ice) to show the underlying integer (2).
 //

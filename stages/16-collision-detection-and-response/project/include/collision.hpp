@@ -4,9 +4,9 @@
 // collide — pure 2D collision detection & response, built on gmath::Vec2f.  (YOUR TASK)
 //
 // This is the STARTER. The structs (AABB / Circle / Hit), the aabb_center helper,
-// and the gmath dependency are given. YOUR job is to implement the four functions
+// and the gmath dependency are given. YOUR job is to implement the five functions
 // marked `// TODO(stage 16): ...` — aabb_vs_aabb, circle_vs_circle, circle_vs_aabb,
-// and reflect_velocity. Each ships as a placeholder return so the project compiles
+// reflect_velocity and resolve_impulse. Each ships as a placeholder return so the project compiles
 // and the window app links, but ../tests/test_collision.cpp starts RED until you
 // fill them in. A reference is in ../solution/include/collision.hpp — try it first.
 //
@@ -131,6 +131,41 @@ inline gmath::Vec2f reflect_velocity(const gmath::Vec2f& v, const gmath::Vec2f& 
     (void)normal;
     (void)restitution;
     return v;  // placeholder: no reflection yet
+}
+
+
+// --- response: two moving bodies (shared impulse) ---------------------------
+//
+// reflect_velocity is right when ONE side is immovable (a wall, a paddle). When
+// two bodies that BOTH move collide, reflecting each one's own velocity is
+// wrong: a ball hitting a ball at rest would bounce back while the other never
+// moves, and momentum is not conserved. The correct response looks at the
+// RELATIVE velocity along the normal and applies one equal-and-opposite
+// impulse j to both bodies:
+//
+//   vrel = va - vb                 (normal points from B toward A, unit length)
+//   vn   = dot(vrel, n)            (< 0 means they are approaching)
+//   j    = -(1 + e) * vn / (inv_mass_a + inv_mass_b)
+//   va  += n * (j * inv_mass_a)
+//   vb  -= n * (j * inv_mass_b)
+//
+// We pass INVERSE masses (1/m) because they make "immovable" easy: inverse mass
+// 0 means infinite mass, so that body doesn't move and the formula collapses to
+// reflect_velocity for the other one. Equal masses: pass 1 and 1. With e = 1 and
+// equal masses, a head-on hit simply SWAPS the two normal velocities.
+inline void resolve_impulse(gmath::Vec2f& va, gmath::Vec2f& vb, float inv_mass_a,
+                            float inv_mass_b, const gmath::Vec2f& normal, float restitution) {
+    // TODO(stage 16): apply one shared impulse along `normal` (unit, B -> A).
+    // If inv_mass_a + inv_mass_b <= 0, return (both immovable). Let
+    // vn = dot(va - vb, normal); if vn >= 0 they're separating — return. Else
+    //   j = -(1 + restitution) * vn / (inv_mass_a + inv_mass_b)
+    //   va += normal * (j * inv_mass_a);   vb -= normal * (j * inv_mass_b).
+    (void)va;
+    (void)vb;
+    (void)inv_mass_a;
+    (void)inv_mass_b;
+    (void)normal;
+    (void)restitution;
 }
 
 }  // namespace collide

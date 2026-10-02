@@ -10,7 +10,8 @@ maths is pure and unit-tested; the window is just the show.
 **New concepts:** axis-aligned bounding boxes · overlap tests · the
 **penetration vector / MTV** (minimum translation vector) · the **contact
 normal** · closest-point circle-vs-box · **positional correction** · **restitution**
-(bounce) via `reflect_velocity` · `std::optional` as "hit or miss".
+(bounce) via `reflect_velocity` · the two-body **impulse** (`resolve_impulse`) ·
+`std::optional` as "hit or miss".
 
 > This is the payoff of stages 14–15: stage 14 gave the loop and `dt`, stage 15
 > gave motion and the `gmath` vector functions (`dot`, `length`, `normalize`) —
@@ -138,12 +139,29 @@ Once detection hands you a `Hit`, response is two steps:
    Reflect **only** when the object is moving *into* the surface (`dot(v, n) < 0`),
    or it can stick and jitter.
 
-> **Two-body caveat.** The mini-project uses an equal-"mass" approximation: split
-> the penetration and reflect each body off the contact normal. A physically
-> exact response between two moving bodies weighs the bounce by their masses and
-> applies a single shared **impulse**. That's beyond this stage; the wall/paddle
-> case (one side immovable), which is what Pong needs, is exactly the simple
-> `reflect_velocity` above.
+### Two moving bodies: one shared impulse
+
+`reflect_velocity` is right when one side can't move (a wall, a paddle — what
+Pong needs). When **both** bodies move, reflecting each one's own velocity off
+the normal *looks* plausible but is wrong: a ball that hits a ball at rest
+bounces straight back while the other one never moves, so momentum isn't
+conserved. Instead, use the **relative** velocity along the normal and apply one
+equal-and-opposite **impulse** `j` to both (normal `n` points from B toward A):
+
+```cpp
+vn = dot(va - vb, n);                       // < 0: they're approaching
+if (vn < 0) {
+    j  = -(1 + e) * vn / (inv_mass_a + inv_mass_b);
+    va += n * (j * inv_mass_a);
+    vb -= n * (j * inv_mass_b);
+}
+```
+
+Using **inverse** masses (`1/m`) makes an immovable body easy: inverse mass 0.
+Then the formula collapses to `reflect_velocity` for the other body. With equal
+masses and `e = 1`, a head-on hit simply **swaps** the two normal velocities.
+That's `collide::resolve_impulse`; the mini-project uses it (inverse mass 1 for
+everyone) after splitting the penetration half-and-half between the two bodies.
 
 ---
 
@@ -213,22 +231,21 @@ Try each yourself before peeking at the `.solution.cpp`.
 per-frame move/wall-bounce/pairwise-resolve glue and all the drawing in
 [`src/main.cpp`](project/src/main.cpp) — is complete. What's missing is the **collision maths** in
 [`include/collision.hpp`](project/include/collision.hpp): the three detectors `aabb_vs_aabb`,
-`circle_vs_circle`, `circle_vs_aabb` and `reflect_velocity` ship as `// TODO(stage 16)` stubs, so
+`circle_vs_circle`, `circle_vs_aabb`, plus `reflect_velocity` and `resolve_impulse`, ship as `// TODO(stage 16)` stubs, so
 the app builds and links but nothing collides and [`tests/test_collision.cpp`](project/tests/test_collision.cpp)
 starts **RED**. Implement each function (the header comments walk through the maths) and drive the
 suite green. A handful of circles and AABBs then drift around the window; each frame they move,
 bounce off the four container walls, and are tested pairwise with the right predicate. On a hit
-they're separated by the penetration vector and both velocities bounce with restitution. It
+they're separated by the penetration vector and exchange one shared impulse with restitution. It
 exercises **all** of the stage:
 
 - all three detectors, dispatched by shape pair,
 - the penetration vector driving **positional correction**,
-- `reflect_velocity` for the **bounce** (walls and pairs),
+- `reflect_velocity` for the **wall bounce** and `resolve_impulse` for **pairs**,
 - the `dt` clamp habit from stage 14 so nothing tunnels through a wall.
 
-Every predicate and the response math is covered by the Catch2 suite you can run
-headless here. The window itself is *unverified-by-execution* in this course's
-build box (no display) but compiles and links against SFML.
+Every predicate and the response math is covered by the Catch2 suite, which runs
+without opening a window. Run the app to check the window itself.
 
 ```bash
 cd project
@@ -263,10 +280,13 @@ ctest --test-dir project/solution/build --output-on-failure   # GREEN
       distance avoids a needless `sqrt`.
 - [ ] I can **resolve** a collision: positional correction + `reflect_velocity`
       with **restitution**, only when moving into the surface.
+- [ ] I can explain why two moving bodies need **one shared impulse** on their
+      relative velocity, and why reflecting each velocity separately breaks momentum.
 - [ ] I know **SAT** is the rotated-shape generalisation and that broad-phase
       structures exist — both are out of scope here.
 - [ ] I implemented the mini-project's `collision.hpp` (`aabb_vs_aabb`, `circle_vs_circle`,
-      `circle_vs_aabb`, `reflect_velocity`) — pure and separate from the window — and drove
+      `circle_vs_aabb`, `reflect_velocity`, `resolve_impulse`) — pure and separate from the
+      window — and drove
       `test_collision.cpp` from red to green.
 
 Further reading: [`../../RESOURCES.md`](../../RESOURCES.md) — Randy Gallegos /

@@ -50,7 +50,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-# --- the SFML app (build+link is the bar) -----------------------------------
+# --- the SFML app (not run by ctest; launch it to check it by eye) ---------
 add_executable(particle_demo
     src/main.cpp
     src/particle_render.cpp

@@ -166,16 +166,14 @@ ctest --test-dir build --output-on-failure   # PURE-logic tests — RED until yo
 
 Same environment notes as stage 26 apply (they're mostly about the machine, not the code):
 
-- **Network + sandbox** — the first configure git-clones SFML/Catch2 from GitHub.
+- **Network** — the first configure git-clones SFML/Catch2 from GitHub.
 - **Compiler** — on macOS build with Apple Clang (`-DCMAKE_CXX_COMPILER=/usr/bin/clang++`); SFML's
   window backend is Objective-C++.
 - **"Could NOT find OpenGL" / SDK** — point CMake at the SDK, e.g.
   `-DCMAKE_OSX_SYSROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk`.
-- **No display / no font** — build + `ctest` are the bar; the window and the `sf::Text` HUD need a
-  desktop session and an available system font. `eng::load_system_font` degrades gracefully (the
-  game runs without the HUD text rather than crashing). **The window's visual behaviour is
-  therefore *unverified-by-execution* in a headless setup** — the game logic that the tests cover
-  is what's guaranteed.
+- **No display / no font** — the window and the `sf::Text` HUD need a desktop session and an
+  available system font. `eng::load_system_font` degrades gracefully (the game runs without the HUD
+  text rather than crashing). `ctest` covers the game logic; check the visuals by playing the game.
 
 ---
 
@@ -243,7 +241,8 @@ Everything you learned across the course is in that loop:
 ### Where to take it next
 
 - give items real effects (a potion raises `hp`; reflect it in the HUD and the save);
-- add a second `Scene` (a title screen, or a pause overlay) and push/pop it on the `SceneStack`;
+- add a second `Scene` (a title screen, or a pause overlay) and push/pop it on the `SceneStack`
+  — from inside a scene via `stack()->push(...)` / `stack()->pop()`, which the stack defers safely;
 - swap procedural tile colours for a real tileset texture through `ResourceManager<sf::Texture>`;
 - restore *world* item state on load (currently load restores the player + bag, not which items
   are still on the ground).

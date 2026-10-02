@@ -84,9 +84,14 @@ Three design decisions worth dwelling on:
   The lifetime is safe because the manager owns the resource for as long as it lives.
 - **It stores `std::unique_ptr<T>`, not `T`.** Two reasons. First, RAII ownership (stages 11/07):
   when the manager is destroyed — or you call `clear()` — the `unique_ptr` destructors free every
-  resource automatically. Second, and subtly: an `unordered_map` may **rehash** as it grows, moving
-  its elements. If we stored `T` by value, a `T&` we handed out earlier could dangle after a
-  rehash. A `unique_ptr` keeps the `T` at a **stable heap address**, so references stay valid.
+  resource automatically. Second, a **stable address that doesn't depend on the container**.
+  `std::unordered_map` happens to be node-based: a rehash invalidates *iterators* but never moves
+  the elements, so even a `T` stored by value would keep its address. But that's a property of
+  this one container. Swap it for a `std::vector`, a sorted `flat_map` or most third-party hash
+  maps and growing it *relocates* the elements — every `T&` handed out earlier would dangle. With
+  `unique_ptr<T>` the `T` lives in its own heap allocation, so references stay valid whatever
+  container holds the pointers. It also lets `T` be non-movable or polymorphic, and lets us load
+  into a temporary and only insert it once loading succeeded.
 
 > **`const`-correctness (course thread).** `is_cached` and `size` are `const` — querying the cache
 > doesn't change it. `get` is non-const because a miss mutates the cache.
@@ -251,8 +256,8 @@ cmake --build project/solution/build
 ctest --test-dir project/solution/build --output-on-failure   # all green
 ```
 
-Build + link of your version is verified; on-screen rendering is unverified-by-execution (CI has no
-display), but the asset pipeline and caching are exercised by the tests.
+Run the app to check the on-screen rendering yourself; the asset pipeline and caching are exercised
+by the tests.
 
 ---
 
@@ -262,7 +267,7 @@ display), but the asset pipeline and caching are exercised by the tests.
       green.
 - [ ] I can explain why loading each asset once and sharing it (by reference) beats copying.
 - [ ] I implemented `get` with load-on-first-use caching and understand why it returns `T&`.
-- [ ] I know why the cache stores `unique_ptr<T>` (RAII cleanup + stable address across rehash).
+- [ ] I know why the cache stores `unique_ptr<T>` (RAII cleanup + a stable address that doesn't depend on the container).
 - [ ] I can describe data-driven design and why the level lives in a file, not in C++.
 - [ ] My parser reads from an `istream` so it's testable without touching disk.
 - [ ] I proved, with a fake resource, that the manager loads once and caches.

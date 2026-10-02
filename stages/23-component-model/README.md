@@ -186,8 +186,8 @@ includes SFML, and all it does is read input and draw a rectangle per entity.
 
 That separation is why [`project/tests/test_ecs.cpp`](project/tests/test_ecs.cpp) can assert on the
 whole model with no window: component storage, the movement query, the bounce reflection, and AABB
-overlap are all pure functions of their inputs. Rendering (which needs a display) stays
-unverified-by-execution; the *logic* is nailed down by tests. This is the same discipline the
+overlap are all pure functions of their inputs. Rendering (which needs a display) you check
+by running the app; the *logic* is nailed down by tests. This is the same discipline the
 roadmap has pushed since stage 13.
 
 ---
@@ -279,8 +279,7 @@ cmake --build project/solution/build
 ctest --test-dir project/solution/build --output-on-failure   # all green
 ```
 
-Build + link of your version is verified; the on-screen behaviour is unverified-by-execution (CI
-has no display).
+The tests cover the logic; run the app to check the on-screen behaviour yourself.
 
 ---
 

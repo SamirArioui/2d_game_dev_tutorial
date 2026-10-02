@@ -15,6 +15,7 @@
 // touches SFML.
 // ============================================================================
 
+#include <cmath>
 #include <cstddef>
 #include <random>
 #include <vector>
@@ -46,6 +47,8 @@ struct Particle {
 
 class ParticleSystem {
 public:
+    static constexpr float DragPerSecond = 1.212f;  // k in exp(-k*dt), see update()
+
     explicit ParticleSystem(std::size_t capacity = 512) : pool_(capacity), rng_(std::random_device{}()) {}
 
     // Spawn up to `count` particles at `pos`, flying outward in random directions
@@ -78,7 +81,11 @@ public:
             }
             p.life -= dt;
             p.pos += p.vel * dt;
-            p.vel *= 0.98f;  // simple drag
+            // Drag. Multiplying by a fixed factor EACH FRAME (vel *= 0.98f) would
+            // slow particles down faster at 144 FPS than at 30 FPS. Scaling by
+            // exp(-k*dt) gives the same slowdown per SECOND at any frame rate:
+            // exp(-1.212 / 60) ≈ 0.98, i.e. the old 0.98-per-frame at 60 FPS.
+            p.vel *= std::exp(-DragPerSecond * dt);
         }
     }
 

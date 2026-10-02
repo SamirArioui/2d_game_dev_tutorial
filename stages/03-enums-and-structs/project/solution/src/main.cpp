@@ -55,14 +55,13 @@ std::string type_name(DamageType type) {
             return "Fire";
         case DamageType::Ice:
             return "Ice";
-        default:
-            return "Unknown";
     }
+    return "Unknown";  // only reached for an out-of-range value
 }
 
 // The damage-type table: how much each type scales the raw hit. A switch over the enum is
-// the idiomatic way to express "one value per case". The default protects us if the enum
-// ever gains a case we forget to handle here.
+// the idiomatic way to express "one value per case". There is deliberately NO `default:`,
+// so if the enum ever gains a case we forget to handle here, -Wswitch warns about it.
 float damage_multiplier(DamageType type) {
     switch (type) {
         case DamageType::Physical:
@@ -71,9 +70,8 @@ float damage_multiplier(DamageType type) {
             return 1.5f;   // strong against this enemy
         case DamageType::Ice:
             return 0.75f;  // resisted
-        default:
-            return 1.0f;
     }
+    return 1.0f;  // only reached for an out-of-range value
 }
 
 // Compute final damage from attacker/defender stats and a damage type.

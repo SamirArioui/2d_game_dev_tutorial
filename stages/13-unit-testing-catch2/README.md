@@ -221,7 +221,7 @@ cmake --build build --target 05_tdd_percent
 ./build/05_tdd_percent
 ```
 
-> **Sandbox / offline note:** the first configure of each project needs to reach `github.com` to
+> **Offline note:** the first configure of each project needs to reach `github.com` to
 > clone Catch2. After that it's cached in `build/_deps` and every later build is offline.
 
 ---

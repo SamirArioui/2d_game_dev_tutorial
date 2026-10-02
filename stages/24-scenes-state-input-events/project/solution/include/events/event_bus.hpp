@@ -15,6 +15,7 @@
 // lambda, or a lambda that captured state, all behind one type.
 // ===========================================================================
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <unordered_map>
@@ -31,30 +32,94 @@ public:
     // real bus might pass a variant or a small struct per event type.
     using Handler = std::function<void(int)>;
 
+    // subscribe() returns an id you pass to unsubscribe() later. Unsubscribe before the object a
+    // handler captured goes away — e.g. in the destructor of a scene that subscribed `[this]` —
+    // or the bus would call into a dead object (a dangling capture).
+    using SubscriptionId = std::size_t;
+
     // Register a callback for an event type. Many handlers can subscribe to the same type.
-    void subscribe(EventType type, Handler handler) {
-        handlers_[type].push_back(std::move(handler));
+    SubscriptionId subscribe(EventType type, Handler handler) {
+        const SubscriptionId id = next_id_++;
+        handlers_[type].push_back({id, std::move(handler)});
+        return id;
+    }
+
+    // Stop calling the handler with this id. Safe even from inside a handler during emit(): the
+    // entry is only blanked now and physically removed once no emit() is running.
+    void unsubscribe(SubscriptionId id) {
+        for (auto& [type, subs] : handlers_) {
+            for (auto& sub : subs) {
+                if (sub.id == id) {
+                    sub.handler = nullptr;
+                }
+            }
+        }
+        if (emitting_ == 0) {
+            remove_dead();
+        }
     }
 
     // Fire an event: call every handler subscribed to `type`, in subscription order. If nobody is
     // listening it's a harmless no-op — the emitter never needs to know who (if anyone) cares.
-    void emit(EventType type, int payload = 0) const {
+    //
+    // Handlers may subscribe or unsubscribe WHILE we are iterating, so:
+    //   - we hold a reference to the vector, not a map iterator (subscribing to a NEW type can
+    //     rehash the map, which invalidates iterators; references to elements survive);
+    //   - we loop by index up to the size at the START, so new subscribers wait for the next emit;
+    //   - we call a COPY of each handler: a push_back may reallocate the vector and move the
+    //     std::function we'd otherwise be running out from under ourselves.
+    void emit(EventType type, int payload = 0) {
         auto it = handlers_.find(type);
         if (it == handlers_.end()) {
             return;
         }
-        for (const auto& handler : it->second) {
-            handler(payload);
+        std::vector<Subscription>& subs = it->second;
+        const std::size_t count = subs.size();
+        ++emitting_;
+        for (std::size_t i = 0; i < count; ++i) {
+            Handler handler = subs[i].handler;
+            if (handler) {  // blank = unsubscribed
+                handler(payload);
+            }
+        }
+        --emitting_;
+        if (emitting_ == 0) {
+            remove_dead();
         }
     }
 
     std::size_t subscriber_count(EventType type) const {
         auto it = handlers_.find(type);
-        return it == handlers_.end() ? 0 : it->second.size();
+        if (it == handlers_.end()) {
+            return 0;
+        }
+        std::size_t count = 0;
+        for (const auto& sub : it->second) {
+            if (sub.handler) {
+                ++count;
+            }
+        }
+        return count;
     }
 
 private:
-    std::unordered_map<EventType, std::vector<Handler>> handlers_;
+    struct Subscription {
+        SubscriptionId id;
+        Handler handler;  // empty once unsubscribed
+    };
+
+    // Erase blanked entries (erase-remove idiom). Only called when no emit() is iterating.
+    void remove_dead() {
+        for (auto& [type, subs] : handlers_) {
+            subs.erase(std::remove_if(subs.begin(), subs.end(),
+                                      [](const Subscription& s) { return !s.handler; }),
+                       subs.end());
+        }
+    }
+
+    std::unordered_map<EventType, std::vector<Subscription>> handlers_;
+    SubscriptionId next_id_{1};
+    int emitting_{0};  // > 0 while emit() is running (a handler may emit, so it can nest)
 };
 
 }  // namespace events

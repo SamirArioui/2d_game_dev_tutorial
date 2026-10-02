@@ -216,7 +216,7 @@ cmake --build build          # builds libgame.a, fmt, then the app
 You should see a `fmt`-formatted character sheet, a value-sorted inventory, and a "saved and
 reloaded" line proving the whole library works together.
 
-> **Sandbox / offline note:** the first configure needs to reach `github.com`. If your environment
+> **Offline note:** the first configure needs to reach `github.com`. If your environment
 > blocks it, run the configure once with network enabled; the cached clone makes every later build
 > offline.
 

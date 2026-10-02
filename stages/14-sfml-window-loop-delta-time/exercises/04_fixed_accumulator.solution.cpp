@@ -13,7 +13,12 @@ int steps_to_run(float& accumulator, float frame_dt, float fixed_dt, int max_ste
         accumulator -= fixed_dt;
         ++steps;
     }
-    // Whatever is left is under fixed_dt (or capped-out); it waits for next call.
+    // Capped out with whole slices still banked? Drop them: carrying the backlog
+    // would keep every later frame at max_steps and push render alpha past 1.
+    if (accumulator >= fixed_dt) {
+        accumulator = 0.0f;
+    }
+    // Whatever is left is now under fixed_dt; it waits for the next call.
     return steps;
 }
 
@@ -42,4 +47,6 @@ TEST_CASE("max_steps caps the work per call (no spiral of death)") {
     const float fixed_dt = 1.0f / 120.0f;
     float acc = 0.0f;
     REQUIRE(steps_to_run(acc, 1.0f, fixed_dt, 8) == 8);
+    // The un-simulated backlog is dropped, not carried into the next frame.
+    REQUIRE(acc < fixed_dt);
 }
